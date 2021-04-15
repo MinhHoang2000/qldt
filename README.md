@@ -35,9 +35,11 @@
 
         To make new migrations:
             1. delete all migraitons files in qldt
-            2. drop database qldt_db
-            3. create database qldt_db
-            4. use qldt_db;
+            2. docker-compose exec backend python manage.py makemigrations account school students teachers persons
+            3. drop database qldt_db
+            4. create database qldt_db
+            5. use qldt_db;
+            6. docker-compose exec backend python manage.py migrate
 
         Stop:
             docker-commpose down

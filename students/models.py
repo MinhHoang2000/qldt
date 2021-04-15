@@ -1,15 +1,15 @@
 import uuid
 from django.db import models
 from accounts.models import Account
-from persons.models import PersonInfo, Health, Archivement
+from persons.models import PersonInfo, Health, Achievement
 from school.models import Classroom, Course
 
 
 class Student(models.Model):
-    id = models.ForeignKey(primary_key=True, PersonInfo, on_delete=models.CASCADE)
+    student_id = models.OneToOneField(PersonInfo, on_delete=models.CASCADE)
     classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE, related_name='students')
     health = models.ForeignKey(Health, on_delete=models.CASCADE)
-    achievements = models.ManyToManyField(Archivement, related_name='students', db_table='student_archivement')
+    achievements = models.ManyToManyField(Achievement, related_name='students', db_table='student_archivement')
     status = models.CharField(max_length=64)
     admission_year = models.SmallIntegerField()
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='student')
@@ -19,7 +19,7 @@ class Student(models.Model):
 
 
 class Parent(models.Model):
-    id = models.ForeignKey(PersonInfo, on_delete=models.CASCADE)
+    parent_id = models.OneToOneField(PersonInfo, on_delete=models.CASCADE)
     avacation = models.CharField(max_length=128)
 
     class Meta:

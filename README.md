@@ -7,7 +7,7 @@
 
     Push to git:
         git remote add origin https://github.com/LongPhanPip/qldt
-        git push origin master
+        git push -u origin master
 
     Prequisite:
         Python: 3.8

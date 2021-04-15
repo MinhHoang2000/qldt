@@ -4,11 +4,14 @@ from django.utils import timezone
 
 
 class PersonInfo(models.Model):
+    GENDERS = [('M', 'Nam'),
+               ('F', 'Nu')]
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     first_name = models.CharField(max_length=32)
     last_name = models.CharField(max_length=32)
-    gender = models.BooleanField()
-    date_of_birth = models.DateTimeField()
+    gender = models.CharField(max_length=1, choices=GENDERS)
+    date_of_birth = models.DateField()
     address = models.CharField(max_length=128)
     ethnicity = models.CharField(max_length=32, null=True)
     religion = models.CharField(max_length=32, null=True)
@@ -18,7 +21,7 @@ class PersonInfo(models.Model):
         db_table = 'person_info'
 
     def __str__(self):
-        return self.first_name
+        return self.last_name + ' ' + self.first_name
 
 
 class Achievement(models.Model):
@@ -35,8 +38,8 @@ class Health(models.Model):
     height = models.SmallIntegerField()
     weight = models.SmallIntegerField()
     eye_sight = models.SmallIntegerField()
-    health_status = models.TextField()
-    disease = models.TextField()
+    health_status = models.TextField(null=True)
+    disease = models.TextField(null=True)
 
     class Meta:
         db_table = 'health'

@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.contrib.auth.models import _user_has_perm
 
 
+#persmission table
 class Permission(models.Model):
     id = models.AutoField(primary_key=True)
     permission_name = models.CharField(max_length=128)
@@ -28,6 +29,8 @@ class Account(AbstractBaseUser):
     is_admin = models.BooleanField('admin permisson', default=False)
     is_active = models.BooleanField('active', default=True)
     join_at = models.DateTimeField('join at', default=timezone.now)
+
+    # Create new table account_permission
     permissions = models.ManyToManyField(Permission, related_name='account', db_table='account_permissions')
 
     USERNAME_FIELD = 'username'

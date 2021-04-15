@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from .managers import CustomUserManager
@@ -7,7 +8,7 @@ from django.utils import timezone
 from django.contrib.auth.models import _user_has_perm
 
 
-#persmission table
+# persmission table
 class Permission(models.Model):
     id = models.AutoField(primary_key=True)
     permission_name = models.CharField(max_length=128)
@@ -18,6 +19,7 @@ class Permission(models.Model):
 
 
 class Account(AbstractBaseUser):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     username = models.CharField('username',
                                 max_length=128,
                                 unique=True,

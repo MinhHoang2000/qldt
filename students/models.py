@@ -8,6 +8,8 @@ class Student(models.Model):
     STATUS = [('DH', 'Dang hoc'),
               ('DT', 'Dinh chi hoc'),
               ('TH', 'Thoi hoc')]
+
+    id = models.AutoField(primary_key=True)
     person = models.OneToOneField(PersonInfo, on_delete=models.CASCADE)
     classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE, related_name='students')
     health = models.ForeignKey(Health, on_delete=models.CASCADE, null=True)
@@ -20,18 +22,19 @@ class Student(models.Model):
         db_table = 'student'
 
     def __str__(self):
-        return person.__str__()
+        return self.person.__str__()
 
 
 class Parent(models.Model):
     person = models.OneToOneField(PersonInfo, on_delete=models.CASCADE)
     avacation = models.CharField(max_length=128)
+    students = models.ManyToManyField(Student, related_name='parents', db_table='parent_student')
 
     class Meta:
         db_table = 'parent'
 
     def __str__(self):
-        return person.__str__()
+        return self.person.__str__()
 
 
 class Grade(models.Model):

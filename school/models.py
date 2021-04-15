@@ -58,6 +58,7 @@ class Device(models.Model):
 
 class DeviceManage(models.Model):
     id = models.AutoField(primary_key=True)
+    device = models.ForeignKey(Device, on_delete=models.CASCADE, related_name='device_manages')
     day_of_week = models.SmallIntegerField()
     shift = models.SmallIntegerField()
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='devices')

@@ -37,7 +37,7 @@ class Account(AbstractBaseUser):
 
     USERNAME_FIELD = 'username'
     EMAIL_FIELD = 'email'
-    REQUIRED_FIELDS = ['email']
+    REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
 

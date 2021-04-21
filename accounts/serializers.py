@@ -1,20 +1,27 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, password_validation
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
 user = get_user_model()
 
 
-class AccountSerializer(serializers.Serializer):
+class AccountRegisterSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=128, required=True)
     password = serializers.CharField(required=True, write_only=True)
+    email = serializers.CharField()
 
     def validate_username(self, value):
-        try:
-            account = user.objects.get(username=value)
-        except user.DoesNotExist:
-            raise serializers.ValidationError('Username not found')
-        return account
+        account = user.objects.filter(username=value)
+        if account.exists():
+            raise serializers.ValidationError('This username is already taken')
+        return value
+
+    def validata_password(sefl, value):
+        password_validation.validate_password(value)
+        return value
+
+    def create(self, validated_data):
+        return user.objects.create(**validated_data)
 
 
 class AuthAccountSerializer(serializers.ModelSerializer):
@@ -25,6 +32,6 @@ class AuthAccountSerializer(serializers.ModelSerializer):
         fields = ['username', 'is_admin', 'token']
 
     def get_token(self, obj):
-        if Token.objects.get(user=obj):
+        if Token.objects.filter(user=obj):
             return Token.objects.get(user=obj).key
         return Token.objects.create(user=obj).key

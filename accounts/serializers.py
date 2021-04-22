@@ -5,6 +5,19 @@ from rest_framework.authtoken.models import Token
 user = get_user_model()
 
 
+class AuthAccountSerializer(serializers.ModelSerializer):
+    token = serializers.SerializerMethodField()
+
+    class Meta:
+        model = user
+        fields = ['username', 'is_admin', 'token']
+
+    def get_token(self, obj):
+        if Token.objects.filter(user=obj):
+            return Token.objects.get(user=obj).key
+        return Token.objects.create(user=obj).key
+
+
 class AccountRegisterSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=128, required=True)
     password = serializers.CharField(required=True, write_only=True)
@@ -24,14 +37,24 @@ class AccountRegisterSerializer(serializers.Serializer):
         return user.objects.create(**validated_data)
 
 
-class AuthAccountSerializer(serializers.ModelSerializer):
-    token = serializers.SerializerMethodField()
+class ChangePasswordSerializer(serializers.Serializer):
+    current_password = serializers.CharField(required=True, write_only=True)
+    new_password = serializers.CharField(required=True, write_only=True)
 
-    class Meta:
-        model = user
-        fields = ['username', 'is_admin', 'token']
+    def validate_current_password(self, value):
+        if self.context['request'].user.check_password(value):
+            return value
+        else:
+            raise serializers.ValidationError('Your current password is wrong')
 
-    def get_token(self, obj):
-        if Token.objects.filter(user=obj):
-            return Token.objects.get(user=obj).key
-        return Token.objects.create(user=obj).key
+    def validate_new_password(self, value):
+        password_validation.validate_password(value)
+        return value
+
+
+class SetPasswordSerializer(serializers.Serializer):
+    new_password = serializers.CharField(required=True, write_only=True)
+
+    def validate_new_password(self, value):
+        password_validation.validate_password(value)
+        return value

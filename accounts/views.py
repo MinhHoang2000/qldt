@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from .serializers import AccountRegisterSerializer, AuthAccountSerializer
+from .serializers import *
 from django.contrib.auth import authenticate, get_user_model
 
 
@@ -27,12 +27,43 @@ class RegisterView(APIView):
     permission_classes = (IsAuthenticated, IsAdminUser)
 
     def post(self, request):
-        credential = JSONParser().parse(request)
-        account = AccountRegisterSerializer(data=credential)
+        account = AccountRegisterSerializer(data=request.data)
 
         try:
             account.is_valid(raise_exception=True)
         except serializers.ValidationError:
             return Response(account.errors, status=status.HTTP_400_BAD_REQUEST)
         account.save()
+        return Response(status=status.HTTP_200_OK)
+
+
+class ChangePasswordView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        account = ChangePasswordSerializer(data=request.data, context={'request': request})
+
+        try:
+            account.is_valid(raise_exception=True)
+            request.user.set_password(account.validated_data['new_password'])
+            request.user.save()
+        except serializers.ValidationError:
+            return Response(account.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(status=status.HTTP_200_OK)
+
+
+class SetPasswordView(APIView):
+    permission_classes = (IsAdminUser, IsAuthenticated)
+
+    def post(self, request, username):
+        account = SetPasswordSerializer(data=request.data)
+        try:
+            account.is_valid(raise_exception=True)
+            user = get_user_model().objects.get(username=username)
+            user.set_password(account.validated_data['new_password'])
+            user.save()
+        except serializers.ValidationError:
+            return Response(account.errors, status=status.HTTP_400_BAD_REQUEST)
+
         return Response(status=status.HTTP_200_OK)

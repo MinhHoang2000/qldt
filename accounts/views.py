@@ -4,8 +4,8 @@ from rest_framework.response import Response
 from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .serializers import *
-from django.contrib.auth import authenticate, get_user_model
-
+from django.contrib.auth import authenticate, get_user_model, logout
+from rest_framework.authtoken.models import Token
 
 class LoginView(APIView):
 
@@ -21,6 +21,16 @@ class LoginView(APIView):
                 return Response(data, status=status.HTTP_200_OK)
         except get_user_model().DoesNotExist:
             return Response('Account does not exist', status=status.HTTP_401_UNAUTHORIZED)
+
+
+class LogoutView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request):
+        user = request.user.auth_token.delete()
+        logout(request)
+
+        return Response('Loggout successfully', status=status.HTTP_200_OK)
 
 
 class RegisterView(APIView):
@@ -51,4 +61,3 @@ class ChangePasswordView(APIView):
             return Response(account.errors, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(status=status.HTTP_200_OK)
-

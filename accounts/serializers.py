@@ -48,13 +48,8 @@ class ChangePasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError('Your current password is wrong')
 
     def validate_new_password(self, value):
-        password_validation.validate_password(value)
-        return value
-
-
-class SetPasswordSerializer(serializers.Serializer):
-    new_password = serializers.CharField(required=True, write_only=True)
-
-    def validate_new_password(self, value):
-        password_validation.validate_password(value)
+        if self.context['request'].user.check_password(value):
+            raise serializers.ValidationError('Your new password is the same to the current one')
+        else:
+            password_validation.validate_password(value)
         return value

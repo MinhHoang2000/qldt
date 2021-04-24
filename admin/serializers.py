@@ -8,3 +8,4 @@ class SetPasswordSerializer(serializers.Serializer):
     def validate_new_password(self, value):
         password_validation.validate_password(value)
         return value
+

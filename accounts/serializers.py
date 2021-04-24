@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model, password_validation
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
+from students.models import Student
+from teachers.models import Teacher
 
 user = get_user_model()
 
@@ -10,7 +12,7 @@ class AuthAccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = user
-        fields = ['username', 'is_admin', 'token']
+        fields = ['id', 'username', 'is_admin', 'token']
 
     def get_token(self, obj):
         if Token.objects.filter(user=obj):
@@ -53,3 +55,19 @@ class ChangePasswordSerializer(serializers.Serializer):
         else:
             password_validation.validate_password(value)
         return value
+
+
+class StudentProfileSerializer(serializers.ModelSerializer):
+    account_type = serializers.CharField(default='student')
+
+    class Meta:
+        model = Student
+        fields = ['id', 'person', 'account_type']
+
+
+class TeacherProfileSerializer(serializers.ModelSerializer):
+    account_type = serializers.CharField(default='teacher')
+
+    class Meta:
+        model = Teacher
+        fields = ['id', 'person', 'account_type']

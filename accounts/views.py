@@ -61,3 +61,20 @@ class ChangePasswordView(APIView):
             return Response(account.errors, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(status=status.HTTP_200_OK)
+
+
+class ProfileView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        if request.user.is_admin:
+            response = 'This account is admin'
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+        elif request.user.student.exists():
+            student = request.user.student.first()
+            profile = StudentProfileSerializer(student)
+        else:
+            teacher = request.user.teacher.first()
+            profile = TeacherProfileSerializer(teacher)
+
+        return Response(profile.data)

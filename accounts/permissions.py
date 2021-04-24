@@ -1,8 +1,8 @@
 from rest_framework.permissions import BasePermission
 
 
-class IsAdmin(BasePermission):
-    def has_permission(self, request, view):
+class IsOwner(BasePermission):
+    def has_object_permission(self, request, view, obj):
         if request.user.is_anonymous:
             return False
-        return request.user.is_admin
+        return obj.account == request.user

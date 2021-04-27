@@ -33,20 +33,6 @@ class LogoutView(APIView):
         return Response('Loggout successfully', status=status.HTTP_200_OK)
 
 
-class RegisterView(APIView):
-    permission_classes = (IsAuthenticated, IsAdminUser)
-
-    def post(self, request):
-        account = AccountRegisterSerializer(data=request.data)
-
-        try:
-            account.is_valid(raise_exception=True)
-        except serializers.ValidationError:
-            return Response(account.errors, status=status.HTTP_400_BAD_REQUEST)
-        account.save()
-        return Response(status=status.HTTP_200_OK)
-
-
 class ChangePasswordView(APIView):
     permission_classes = (IsAuthenticated,)
 

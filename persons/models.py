@@ -2,11 +2,11 @@ import uuid
 from django.db import models
 from django.utils import timezone
 
+GENDERS = [('M', 'Nam'),
+           ('F', 'Nu')]
+
 
 class PersonInfo(models.Model):
-    GENDERS = [('M', 'Nam'),
-               ('F', 'Nu')]
-
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     first_name = models.CharField(max_length=32)
     last_name = models.CharField(max_length=32)

@@ -5,6 +5,7 @@ urlpatterns = [
     path('students', StudentListView.as_view()),
     path('students/<int:pk>', StudentDetailView.as_view()),
     path('teachers', TeacherListView.as_view()),
+    path('teachers/<int:pk>', TeacherDetailView.as_view()),
     path('register', RegisterView.as_view()),
     path('set_password/<username>', SetPasswordView.as_view()),
 ]

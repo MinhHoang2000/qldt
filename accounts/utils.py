@@ -1,4 +1,6 @@
 from .serializers import AccountSerializer
+import logging
+logger = logging.getLogger(__name__)
 
 
 def create_account(account_data):

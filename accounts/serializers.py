@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model, password_validation
 from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 from students.models import Student

@@ -13,6 +13,7 @@ class AccountSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=128, required=True)
     password = serializers.CharField(required=True, write_only=True)
     email = serializers.CharField(required=False)
+    is_admin = serializers.BooleanField(required=False)
 
     def create(self, validated_data):
         if self.context.get('is_admin', False):

@@ -1,16 +1,23 @@
 from rest_framework.views import APIView
+
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from accounts.permissions import IsOwner
+
 from rest_framework import status, serializers, exceptions
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
+
 from .serializers import *
 
 from students.models import Student
 from teachers.models import Teacher
+from django.contrib.auth import get_user_model
+
 from students.serializers import StudentSerializer
 from teachers.serializers import TeacherSerializer
 from accounts.serializers import AccountSerializer
+
+
 from accounts.utils import create_account, update_account
 
 
@@ -26,7 +33,7 @@ class RegisterView(APIView):
 
 
 class UpdateView(APIView):
-    permission_classes = (IsAdminUser, IsAuthenticated, IsOwner)
+    permission_classes = (IsAdminUser, IsAuthenticated)
 
     def post(self, request):
         try:
@@ -35,6 +42,15 @@ class UpdateView(APIView):
             return Response(account.errors, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(status=status.HTTP_200_OK)
+
+
+class AccountListView(APIView):
+    permission_classes = (IsAdminUser, IsAuthenticated)
+
+    def get(self, request):
+        accounts = get_user_model().objects.all()
+        serializer = AccountSerializer(accounts, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class StudentListView(APIView):
@@ -124,3 +140,6 @@ class TeacherDetailView(APIView):
 
         except serializers.ValidationError:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+)

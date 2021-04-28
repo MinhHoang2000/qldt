@@ -11,12 +11,13 @@ from .serializers import *
 
 from students.models import Student
 from teachers.models import Teacher
+from school.models import Classroom
 from django.contrib.auth import get_user_model
 
 from students.serializers import StudentSerializer
 from teachers.serializers import TeacherSerializer
 from accounts.serializers import AccountSerializer
-
+from school.serializers import ClassroomSerializer
 
 from accounts.utils import create_account, update_account
 
@@ -142,4 +143,20 @@ class TeacherDetailView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-)
+class ClassroomListView(APIView):
+    permission_classes = (IsAdminUser, IsAuthenticated)
+
+    def get(self, request):
+        classrooms = Classroom.objects.all()
+        serializer = ClassroomSerializer(classrooms, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        classroom = ClassroomSerializer(data=request.data)
+        try:
+            classroom.is_valid(raise_exception=True)
+            classroom.save()
+            return Response(classroom.data, status=status.HTTP_201_CREATED)
+
+        except serializers.ValidationError:
+            return Response(classroom.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -8,3 +8,5 @@ def get_classroom(pk):
 def assign_classroom_by_id(student, class_pk):
     classroom = Classroom.objects.get(pk=class_pk)
     student.classroom = classroom
+
+

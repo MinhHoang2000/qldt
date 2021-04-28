@@ -160,3 +160,29 @@ class ClassroomListView(APIView):
 
         except serializers.ValidationError:
             return Response(classroom.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ClassroomDetailView(APIView):
+    permission_classes = (IsAdminUser, IsAuthenticated)
+
+    def get_classroom(self, pk):
+        try:
+            classroom = Classroom.objects.get(pk=pk)
+            return classroom
+        except Classroom.DoesNotExist:
+            raise exceptions.NotFound('Classroom does not exist')
+
+    def get(self, request, pk):
+        classroom = self.get_classroom(pk)
+        serializer = ClassroomSerializer(classroom)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request, pk):
+        classroom = self.get_classroom(pk)
+        serializer = ClassroomSerializer(classroom, data=request.data, partial=True)
+        try:
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except serializers.ValidationError:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

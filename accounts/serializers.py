@@ -15,6 +15,8 @@ class AccountSerializer(serializers.Serializer):
     email = serializers.CharField(required=False)
 
     def create(self, validated_data):
+        if self.context.get('is_admin', False):
+            return user.objects.create_superuser(**validated_data)
         return user.objects.create_user(**validated_data)
 
     def update(self, instance, validated_data):

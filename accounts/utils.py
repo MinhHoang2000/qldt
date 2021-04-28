@@ -3,8 +3,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def create_account(account_data):
-    account_serializer = AccountSerializer(data=account_data)
+def create_account(account_data, is_admin=False):
+    account_serializer = AccountSerializer(data=account_data, context={'is_admin': is_admin})
     account_serializer.is_valid(raise_exception=True)
     return account_serializer.save()
 

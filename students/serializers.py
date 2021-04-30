@@ -15,13 +15,12 @@ logger = logging.getLogger(__name__)
 class StudentSerializer(serializers.ModelSerializer):
     account = AccountSerializer()
     person = PersonSerializer()
-    achievements = AchievementSerializer(required=False, allow_null=True, many=True)
     health = HealthSerializer(required=False, allow_null=True)
     classroom_id = serializers.IntegerField()
 
     class Meta:
         model = Student
-        fields = ['id', 'account', 'person', 'classroom_id', 'admission_year', 'health', 'status', 'achievements']
+        fields = ['id', 'account', 'person', 'classroom_id', 'admission_year', 'health', 'status']
 
     def create(self, validated_data):
         person_model = create_person(validated_data.pop('person'))
@@ -66,5 +65,3 @@ class StudentSerializer(serializers.ModelSerializer):
         instance.admission_year = validated_data.get('admission_year', instance.admission_year)
         instance.save()
         return instance
-
-

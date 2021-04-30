@@ -34,7 +34,7 @@ def update_health(student, health_data):
 def get_achievement(pk):
     try:
         return Achievement.objects.get(pk=pk)
-    except Achievement.DoesnotExist:
+    except Achievement.DoesNotExist:
         raise exceptions.NotFound('Student does not exist')
 
 

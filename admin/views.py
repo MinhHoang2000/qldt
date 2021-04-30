@@ -27,6 +27,9 @@ from teachers.utils import get_teacher
 from school.utils import get_classroom
 from persons.utils import get_achievement
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 class RegisterView(APIView):
     permission_classes = (IsAuthenticated, IsAdminUser)
@@ -97,35 +100,27 @@ class StudentDetailView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class AchievementListView(APIView):
+class StudentAchievementListView(APIView):
     def get(self, request):
-        achievements = Achievement.objects.all()
-        serializer = AchievementSerializer(achievements, many=True)
+        students = Student.objects.filter(achievements__isnull=False).distinct()
+        serializer = StudentAchievementSerializer(students, many=True)
         return Response(serializer.data)
 
-    def post(self, request):
-        achievement = AchievementSerializer(data=request.data)
-        try:
-            achievement.is_valid(raise_exception=True)
-            achievement.save()
-            return Response(achievement.data, status=status.HTTP_201_CREATED)
-        except serializers.ValidationError:
-            return Response(achievement.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-class AchievementDetailView(APIView):
+class StudentAchievementDetailView(APIView):
     def get(self, request, pk):
-        achievement = get_achievement(pk)
-        serializer = AchievementSerializer(achievement)
+        student = get_student(pk)
+        serializer = StudentAchievementSerializer(student)
         return Response(serializer.data)
 
-    def post(self, request, pk):
-        achievement = get_achievement(pk)
-        serializer = AchievementSerializer(achievement, data=request.data, partial=True)
+    def put(self, request, pk):
+        student = get_student(pk)
+        serializer = StudentAchievementSerializer(student, data=request.data)
         try:
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
         except serializers.ValidationError:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -202,5 +197,38 @@ class ClassroomDetailView(APIView):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
+        except serializers.ValidationError:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AchievementListView(APIView):
+    def get(self, request):
+        achievements = Achievement.objects.all()
+        serializer = AchievementSerializer(achievements, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        achievement = AchievementSerializer(data=request.data)
+        try:
+            achievement.is_valid(raise_exception=True)
+            achievement.save()
+            return Response(achievement.data, status=status.HTTP_201_CREATED)
+        except serializers.ValidationError:
+            return Response(achievement.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AchievementDetailView(APIView):
+    def get(self, request, pk):
+        achievement = get_achievement(pk)
+        serializer = AchievementSerializer(achievement)
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        achievement = get_achievement(pk)
+        serializer = AchievementSerializer(achievement, data=request.data, partial=True)
+        try:
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
         except serializers.ValidationError:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

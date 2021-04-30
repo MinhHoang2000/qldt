@@ -5,13 +5,22 @@ urlpatterns = [
     path('update', UpdateView.as_view()),
     path('register', RegisterView.as_view()),
     path('accounts', AccountListView.as_view()),
+
+    # student
     path('students', StudentListView.as_view()),
     path('students/<int:pk>', StudentDetailView.as_view()),
-    # path('students/achievements', StudentAchievementView.as_view()),
+
+    # teacher
     path('teachers', TeacherListView.as_view()),
     path('teachers/<int:pk>', TeacherDetailView.as_view()),
+
+    # classroom
     path('classrooms', ClassroomListView.as_view()),
     path('classrooms/<int:pk>', ClassroomDetailView.as_view()),
+
+    # achievements
     path('achievements', AchievementListView.as_view()),
     path('achievements/<int:pk>', AchievementDetailView.as_view()),
+    path('achievements/students', StudentAchievementListView.as_view()),
+    path('achievements/students/<int:pk>', StudentAchievementDetailView.as_view()),
 ]

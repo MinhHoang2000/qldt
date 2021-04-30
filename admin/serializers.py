@@ -1,7 +1,15 @@
 from rest_framework import serializers
 from django.contrib.auth import password_validation
-
 from persons.serializers import AchievementSerializer
+
+from students.models import Student
+from persons.models import Achievement
+
+from persons.utils import get_achievement
+from students.utils import get_student
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 class SetPasswordSerializer(serializers.Serializer):
@@ -12,15 +20,25 @@ class SetPasswordSerializer(serializers.Serializer):
         return value
 
 
-class StudentAchievementSerializer(serializers.Serializer):
-    student_id = serializers.IntegerField()
-    achievements = AchievementSerializer(many=True)
+class StudentAchievementSerializer(serializers.ModelSerializer):
+    student_id = serializers.IntegerField(source='id', read_only=True)
+    achievement_id = serializers.PrimaryKeyRelatedField(source='achievements',
+                                                        many=True,
+                                                        queryset=Achievement.objects.all())
+
+    class Meta:
+        model = Student
+        fields = ['student_id', 'achievement_id']
 
     def create(self, validated_data):
-        student = get_student(validated_data.pop('student_id'))
-        achievement = create_achievenment(validated_data.pop('achievement'))
+        pass
 
-        student.achievements.add(achievement)
-        student.save()
+    def update(self, instance, validated_data):
+        logger.error(validated_data)
+        instance.achievements.clear()
+        for achievement in validated_data.pop('achievements'):
+            instance.achievements.add(achievement)
 
-        return student
+        instance.save()
+
+        return instance

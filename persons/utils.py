@@ -1,4 +1,4 @@
-from .serializers import PersonSerializer
+from .serializers import PersonSerializer, HealthSerializer, AchievementSerializer
 
 
 def create_person(person_data):
@@ -27,3 +27,15 @@ def update_health(student, health_data):
     health_serializer = HealthSerializer(student.health, data=health_data, partial=True)
     health_serializer.is_valid(raise_exception=True)
     health_serializer.save()
+
+
+def create_achievement(achievement_data):
+    achievement = AchievementSerializer(data=achievement_data)
+    achievement.is_valid(raise_exception=True)
+    return achievement.save()
+
+
+def update_achievement(achievement, achievement_data):
+    achievement_serializer = AchievementSerializer(achievement, data=achievement_data, partial=True)
+    achievement_serializer.is_valid(raise_exception=True)
+    achievement_serializer.save()

@@ -1,4 +1,13 @@
 from .serializers import TeacherSerializer
+from .models import Teacher
+
+
+def get_teacher(pk):
+    try:
+        teacher = Teacher.objects.get(pk=pk)
+        return teacher
+    except Teacher.DoesNotExist:
+        raise exceptions.NotFound('Teacher does not exist')
 
 
 def create_teacher(teacher_data):

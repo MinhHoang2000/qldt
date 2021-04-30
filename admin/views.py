@@ -12,14 +12,19 @@ from .serializers import *
 from students.models import Student
 from teachers.models import Teacher
 from school.models import Classroom
+from persons.models import Achievement
 from django.contrib.auth import get_user_model
 
 from students.serializers import StudentSerializer
 from teachers.serializers import TeacherSerializer
 from accounts.serializers import AccountSerializer
 from school.serializers import ClassroomSerializer
+from persons.serializers import AchievementSerializer
 
 from accounts.utils import create_account, update_account
+from students.utils import get_student
+from teachers.utils import get_teacher
+from school.utils import get_classroom
 
 
 class RegisterView(APIView):
@@ -75,15 +80,8 @@ class StudentListView(APIView):
 class StudentDetailView(APIView):
     permission_classes = (IsAdminUser, IsAuthenticated)
 
-    def get_student(self, pk):
-        try:
-            student = Student.objects.get(pk=pk)
-            return student
-        except Teacher.DoesNotExist:
-            raise exceptions.NotFound('Student does not exist')
-
     def get(self, request, pk):
-        student = self.get_student(pk)
+        student = get_student(pk)
         serializer = StudentSerializer(student)
         return Response(serializer.data)
 
@@ -96,6 +94,22 @@ class StudentDetailView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except serializers.ValidationError:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AchievementListView(APIView):
+    def get(self, request):
+        achievements = Achievement.objects.all()
+        serializer = AchievementSerializer(achievements, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        achievement = AchievementSerializer(data=request.data)
+        try:
+            achievement.is_valid(raise_exception=True)
+            achievement.save()
+            return Response(achievement.data, status=status.HTTP_201_CREATED)
+        except:
+            return Response(achievement.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class TeacherListView(APIView):
@@ -119,15 +133,8 @@ class TeacherListView(APIView):
 class TeacherDetailView(APIView):
     permission_classes = (IsAdminUser, IsAuthenticated)
 
-    def get_teacher(self, pk):
-        try:
-            teacher = Teacher.objects.get(pk=pk)
-            return teacher
-        except Teacher.DoesNotExist:
-            raise exceptions.NotFound('Teacher does not exist')
-
     def get(self, request, pk):
-        teacher = self.get_teacher(pk)
+        teacher = get_teacher(pk)
         serializer = TeacherSerializer(teacher)
         return Response(serializer.data)
 

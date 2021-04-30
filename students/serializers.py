@@ -66,3 +66,5 @@ class StudentSerializer(serializers.ModelSerializer):
         instance.admission_year = validated_data.get('admission_year', instance.admission_year)
         instance.save()
         return instance
+
+

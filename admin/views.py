@@ -163,6 +163,31 @@ class TeacherDetailView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class TeacherAchievementListView(APIView):
+    def get(self, request):
+        teachers = Teacher.objects.filter(achievements__isnull=False).distinct()
+        serializer = TeacherAchievementSerializer(teachers, many=True)
+        return Response(serializer.data)
+
+
+class TeacherAchievementDetailView(APIView):
+    def get(self, request, pk):
+        teacher = get_student(pk)
+        serializer = TeacherAchievementSerializer(student)
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        teacher = get_teacher(pk)
+        serializer = TeacehrAchievementSerializer(teacher, data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except serializers.ValidationError:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 class ClassroomListView(APIView):
     permission_classes = (IsAdminUser, IsAuthenticated)
 

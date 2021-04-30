@@ -3,18 +3,24 @@ from accounts.models import Account
 from persons.models import PersonInfo, Health, Achievement
 from school.models import Classroom, Course
 
+LEARNING_STATUS = [('DH', 'Dang hoc'),
+                   ('DT', 'Dinh chi hoc'),
+                   ('TH', 'Thoi hoc')]
+
+SCORES = [('T', 'Tot'),
+          ('K', 'Kha'),
+          ('TB', 'Trung binh'),
+          ('Y', 'Yeu')]
+
 
 class Student(models.Model):
-    STATUS = [('DH', 'Dang hoc'),
-              ('DT', 'Dinh chi hoc'),
-              ('TH', 'Thoi hoc')]
 
     id = models.AutoField(primary_key=True)
     person = models.OneToOneField(PersonInfo, on_delete=models.CASCADE)
     classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE, related_name='students')
     health = models.ForeignKey(Health, on_delete=models.CASCADE, null=True)
     achievements = models.ManyToManyField(Achievement, related_name='students', db_table='student_archivement')
-    status = models.CharField(max_length=2, choices=STATUS, null=True)
+    status = models.CharField(max_length=2, choices=LEARNING_STATUS, null=True)
     admission_year = models.SmallIntegerField()
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='student', null=True)
 
@@ -56,10 +62,6 @@ class Grade(models.Model):
 
 
 class Conduct(models.Model):
-    SCORES = [('T', 'Tot'),
-              ('K', 'Kha'),
-              ('TB', 'Trung binh'),
-              ('Y', 'Yeu')]
     id = models.AutoField(primary_key=True)
     score = models.CharField(max_length=2, choices=SCORES)
     term = models.SmallIntegerField()

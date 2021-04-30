@@ -10,6 +10,10 @@ DAY_OF_WEEK = [('Mon', 'Monday'),
                ('Sat', 'Satuday'),
                ('Sun', 'Sunday')]
 
+DEVICE_STATUS = [('N', 'New'),
+                 ('B', 'Broken'),
+                 ('G', 'Good'), ]
+
 
 class Course(models.Model):
     id = models.AutoField(primary_key=True)
@@ -57,11 +61,8 @@ class ClassRecord(models.Model):
 
 
 class Device(models.Model):
-    STATUS = [('N', 'New'),
-              ('B', 'Broken'),
-              ('G', 'Good'), ]
     id = models.AutoField(primary_key=True)
-    status = models.CharField(max_length=1, choices=STATUS, default='N')
+    status = models.CharField(max_length=1, choices=DEVICE_STATUS, default='N')
     device_name = models.CharField(max_length=128)
 
     class Meta:

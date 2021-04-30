@@ -1,4 +1,6 @@
+from rest_framework import exceptions
 from .serializers import PersonSerializer, HealthSerializer, AchievementSerializer
+from .models import Achievement
 
 
 def create_person(person_data):
@@ -27,6 +29,13 @@ def update_health(student, health_data):
     health_serializer = HealthSerializer(student.health, data=health_data, partial=True)
     health_serializer.is_valid(raise_exception=True)
     health_serializer.save()
+
+
+def get_achievement(pk):
+    try:
+        return Achievement.objects.get(pk=pk)
+    except Achievement.DoesnotExist:
+        raise exceptions.NotFound('Student does not exist')
 
 
 def create_achievement(achievement_data):

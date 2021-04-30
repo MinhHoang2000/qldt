@@ -13,4 +13,5 @@ urlpatterns = [
     path('classrooms', ClassroomListView.as_view()),
     path('classrooms/<int:pk>', ClassroomDetailView.as_view()),
     path('achievements', AchievementListView.as_view()),
+    path('achievements/<int:pk>', AchievementDetailView.as_view()),
 ]

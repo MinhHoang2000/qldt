@@ -1,4 +1,5 @@
 from .models import Student
+from rest_framework import exceptions
 
 
 def get_student(pk):

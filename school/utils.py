@@ -1,3 +1,4 @@
+from rest_framework import exceptions
 from .models import Classroom
 
 

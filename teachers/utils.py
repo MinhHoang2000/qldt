@@ -1,3 +1,4 @@
+from rest_framework import exceptions
 from .serializers import TeacherSerializer
 from .models import Teacher
 

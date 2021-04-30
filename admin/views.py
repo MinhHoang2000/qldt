@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from accounts.permissions import IsOwner
 
-from rest_framework import status, serializers, exceptions
+from rest_framework import status, serializers
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 
@@ -25,6 +25,7 @@ from accounts.utils import create_account, update_account
 from students.utils import get_student
 from teachers.utils import get_teacher
 from school.utils import get_classroom
+from persons.utils import get_achievement
 
 
 class RegisterView(APIView):
@@ -86,7 +87,7 @@ class StudentDetailView(APIView):
         return Response(serializer.data)
 
     def put(self, request, pk):
-        student = self.get_student(pk)
+        student = get_student(pk)
         serializer = StudentSerializer(student, data=request.data, partial=True)
         try:
             serializer.is_valid(raise_exception=True)
@@ -108,8 +109,25 @@ class AchievementListView(APIView):
             achievement.is_valid(raise_exception=True)
             achievement.save()
             return Response(achievement.data, status=status.HTTP_201_CREATED)
-        except:
+        except serializers.ValidationError:
             return Response(achievement.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AchievementDetailView(APIView):
+    def get(self, request, pk):
+        achievement = get_achievement(pk)
+        serializer = AchievementSerializer(achievement)
+        return Response(serializer.data)
+
+    def post(self, request, pk):
+        achievement = get_achievement(pk)
+        serializer = AchievementSerializer(achievement, data=request.data, partial=True)
+        try:
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
+        except serializers.ValidationError:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class TeacherListView(APIView):
@@ -172,20 +190,13 @@ class ClassroomListView(APIView):
 class ClassroomDetailView(APIView):
     permission_classes = (IsAdminUser, IsAuthenticated)
 
-    def get_classroom(self, pk):
-        try:
-            classroom = Classroom.objects.get(pk=pk)
-            return classroom
-        except Classroom.DoesNotExist:
-            raise exceptions.NotFound('Classroom does not exist')
-
     def get(self, request, pk):
-        classroom = self.get_classroom(pk)
+        classroom = get_classroom(pk)
         serializer = ClassroomSerializer(classroom)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, pk):
-        classroom = self.get_classroom(pk)
+        classroom = get_classroom(pk)
         serializer = ClassroomSerializer(classroom, data=request.data, partial=True)
         try:
             serializer.is_valid(raise_exception=True)

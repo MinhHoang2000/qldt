@@ -39,10 +39,11 @@ class StudentSerializer(serializers.ModelSerializer):
     person = PersonSerializer()
     health = HealthSerializer(required=False, allow_null=True)
     classroom_id = serializers.IntegerField()
+    parent_id = serializers.PrimaryKeyRelatedField(source='parents', read_only=True, many=True)
 
     class Meta:
         model = Student
-        fields = ['id', 'account', 'person', 'classroom_id', 'admission_year', 'health', 'status']
+        fields = ['id', 'account', 'person', 'classroom_id', 'admission_year', 'health', 'status', 'parent_id']
 
     def create(self, validated_data):
         person_model = create_person(validated_data.pop('person'))
@@ -89,15 +90,6 @@ class StudentSerializer(serializers.ModelSerializer):
         return instance
 
 
-class ParentSerializer(serializers.ModelSerializer):
-    person = PersonSerializer()
-    students = StudentSerializer(many=True)
-
-    class Meta:
-        model = Parent
-        fields = ['person', 'students', 'avacation']
-
-
 class StudentGradeSerializer(serializers.ModelSerializer):
     grades = GradeSerializer(many=True)
 
@@ -113,3 +105,35 @@ class StudentGradeSerializer(serializers.ModelSerializer):
             grade.is_valid(raise_exception=True)
             grade.save()
         return student
+
+
+class ParentSerializer(serializers.ModelSerializer):
+    person = PersonSerializer()
+    student_id = serializers.PrimaryKeyRelatedField(source='students', many=True, queryset=Student.objects.all())
+
+    class Meta:
+        model = Parent
+        fields = ['id', 'person', 'student_id', 'avacation']
+
+    def create(self, validated_data):
+        logger.error(validated_data)
+        person = create_person(validated_data.pop('person'))
+        parent = Parent.objects.create(person=person, avacation=validated_data.pop('avacation'))
+        for student in validated_data.pop('students'):
+            parent.students.add(student)
+
+        parent.save()
+        return parent
+
+    def update(self, instance, validated_data):
+        try:
+            update_person(instance.person, validated_data.pop('person'))
+        except KeyError:
+            pass
+
+        instance.students.clear()
+        for student in validated_data.pop('students'):
+            instance.students.add(student)
+
+        instance.save()
+        return instance

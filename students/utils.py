@@ -13,7 +13,7 @@ def get_student(pk):
 def get_parent(pk):
     try:
         parent = Parent.objects.get(pk=pk)
-        return student
+        return parent
     except Parent.DoesNotExist:
         raise exceptions.NotFound('Parent does not exist')
 

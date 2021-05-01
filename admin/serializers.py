@@ -30,7 +30,6 @@ class GenerralAchievementSerializer(serializers.ModelSerializer):
         pass
 
     def update(self, instance, validated_data):
-        logger.error(validated_data)
         instance.achievements.clear()
         for achievement in validated_data.pop('achievements'):
             instance.achievements.add(achievement)

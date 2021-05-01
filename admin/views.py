@@ -187,7 +187,7 @@ class ParentListView(APIView):
             parent.save()
             return Response(data=parent.data, status=status.HTTP_201_CREATED)
         except serializers.ValidationError:
-            return Response(student.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(parent.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ParentDetailView(APIView):

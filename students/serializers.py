@@ -3,7 +3,7 @@ from accounts.serializers import AccountSerializer
 from persons.serializers import PersonSerializer, AchievementSerializer, HealthSerializer
 from school.serializers import ClassroomSerializer, CourseSerializer
 
-from .models import Student, Grade
+from .models import Student, Grade, Parent
 from school.models import Classroom
 
 from persons.utils import create_person, update_person, create_health, update_health, assign_health
@@ -20,6 +20,7 @@ class GradeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Grade
         fields = ['id', 'course', 'school_year', 'term', 'quiz1', 'quiz2', 'quiz3', 'test', 'mid_term_test', 'final_test', 'start_update']
+
 
 
 class StudentSerializer(serializers.ModelSerializer):
@@ -75,6 +76,14 @@ class StudentSerializer(serializers.ModelSerializer):
         instance.admission_year = validated_data.get('admission_year', instance.admission_year)
         instance.save()
         return instance
+
+
+class ParentSerializer(serializers.ModelSerializer):
+    person = PersonSerializer()
+    students = StudentSerializer(many=True)
+    class Meta:
+        model = Parent
+        fields = ['person', 'students', 'avacation']
 
 
 class StudentGradeSerializer(serializers.ModelSerializer):

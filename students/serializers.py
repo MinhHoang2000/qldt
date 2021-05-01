@@ -4,23 +4,34 @@ from persons.serializers import PersonSerializer, AchievementSerializer, HealthS
 from school.serializers import ClassroomSerializer, CourseSerializer
 
 from .models import Student, Grade, Parent
-from school.models import Classroom
+from school.models import Classroom, Course
 
 from persons.utils import create_person, update_person, create_health, update_health, assign_health
 from accounts.utils import create_account, update_account
-from school.utils import assign_classroom_by_id, get_classroom
+from school.utils import assign_classroom_by_id, get_classroom, get_course
 
 import logging
 logger = logging.getLogger(__name__)
 
 
 class GradeSerializer(serializers.ModelSerializer):
-    course = CourseSerializer()
+    course_id = serializers.IntegerField()
 
     class Meta:
         model = Grade
-        fields = ['id', 'course', 'school_year', 'term', 'quiz1', 'quiz2', 'quiz3', 'test', 'mid_term_test', 'final_test', 'start_update']
+        fields = ['id', 'course_id', 'school_year', 'term', 'quiz1', 'quiz2', 'quiz3', 'test', 'mid_term_test', 'final_test', 'start_update']
 
+    def validate_course_id(self, value):
+        try:
+            Course.objects.get(pk=value)
+            return value
+        except Course.DoesNotExist:
+            raise serializers.ValidationError('Course does not exist')
+
+    def create(self, validated_data):
+        student = self.context['student']
+        course = get_course(validated_data.pop('course_id'))
+        return Grade.objects.create(course=course, student=student, **validated_data)
 
 
 class StudentSerializer(serializers.ModelSerializer):
@@ -81,6 +92,7 @@ class StudentSerializer(serializers.ModelSerializer):
 class ParentSerializer(serializers.ModelSerializer):
     person = PersonSerializer()
     students = StudentSerializer(many=True)
+
     class Meta:
         model = Parent
         fields = ['person', 'students', 'avacation']
@@ -91,4 +103,13 @@ class StudentGradeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Student
-        fields = ['id', 'grades']
+        fields = ['grades']
+
+    def create(self, validated_data):
+        student = self.context['student']
+
+        for grade_data in validated_data.pop('grades'):
+            grade = GradeSerializer(data=grade_data, context={'student': student})
+            grade.is_valid(raise_exception=True)
+            grade.save()
+        return student

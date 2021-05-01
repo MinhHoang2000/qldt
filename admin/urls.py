@@ -9,7 +9,8 @@ urlpatterns = [
     # student
     path('students', StudentListView.as_view()),
     path('students/<int:pk>', StudentDetailView.as_view()),
-    path('students/<int:pk>/grades', StudentGradeView.as_view()),
+    path('students/<int:pk>/grades', StudentGradeListView.as_view()),
+    path('students/<int:student_pk>/grades/<int:grade_pk>', StudentGradeDetailView.as_view()),
 
     # parent
     path('parents', ParentListView.as_view()),

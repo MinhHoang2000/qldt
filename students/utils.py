@@ -1,4 +1,4 @@
-from .models import Student, Parent
+from .models import Student, Parent, Grade
 from rest_framework import exceptions
 
 
@@ -16,3 +16,10 @@ def get_parent(pk):
         return student
     except Parent.DoesNotExist:
         raise exceptions.NotFound('Parent does not exist')
+
+
+def get_grade(student, pk):
+    try:
+        return student.grades.get(pk=pk)
+    except Grade.DoesNotExist:
+        raise exceptions.NotFound('Grade does not exist')

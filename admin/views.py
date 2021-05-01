@@ -15,14 +15,14 @@ from school.models import Classroom, Course
 from persons.models import Achievement
 from django.contrib.auth import get_user_model
 
-from students.serializers import StudentSerializer, StudentGradeSerializer, ParentSerializer
+from students.serializers import StudentSerializer, StudentGradeSerializer, ParentSerializer, GradeSerializer
 from teachers.serializers import TeacherSerializer
 from accounts.serializers import AccountSerializer
 from school.serializers import ClassroomSerializer, CourseSerializer
 from persons.serializers import AchievementSerializer
 
 from accounts.utils import create_account, update_account
-from students.utils import get_student, get_parent
+from students.utils import get_student, get_parent, get_grade
 from teachers.utils import get_teacher
 from school.utils import get_classroom, get_course
 from persons.utils import get_achievement
@@ -132,7 +132,7 @@ class StudentAchievementDetailView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class StudentGradeView(APIView):
+class StudentGradeListView(APIView):
     permission_classes = (IsAdminUser, IsAuthenticated)
 
     def get(self, request, pk):
@@ -140,8 +140,38 @@ class StudentGradeView(APIView):
         serializer = StudentGradeSerializer(student)
         return Response(serializer.data)
 
+    def post(self, request, pk):
+        student = get_student(pk)
+        serializer = StudentGradeSerializer(data=request.data, context={'student': student})
+        try:
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except serializers.ValidationError:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class StudentGradeDetailView(APIView):
+    def get(self, request, student_pk, grade_pk):
+        student = get_student(student_pk)
+        grade = get_grade(student, grade_pk)
+        serializer = GradeSerializer(grade)
+        return Response(serializer.data)
+
+    def put(self, request, student_pk, grade_pk):
+        student = get_student(student_pk)
+        grade = get_grade(student, grade_pk)
+        serializer = GradeSerializer(grade, data=request.data, partial=True)
+        try:
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
+        except serializers.ValidationError:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # Parent
+
+
 class ParentListView(APIView):
     permission_classes = (IsAdminUser, IsAuthenticated)
 

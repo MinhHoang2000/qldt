@@ -53,4 +53,4 @@ class TeacherAchievementSerializer(GenerralAchievementSerializer):
 
     class Meta:
         model = Teacher
-        fields = ['teacher', 'achievement_id']
+        fields = ['teacher_id', 'achievement_id']

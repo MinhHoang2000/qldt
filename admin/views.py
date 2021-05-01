@@ -11,26 +11,27 @@ from .serializers import *
 
 from students.models import Student
 from teachers.models import Teacher
-from school.models import Classroom
+from school.models import Classroom, Course
 from persons.models import Achievement
 from django.contrib.auth import get_user_model
 
-from students.serializers import StudentSerializer
+from students.serializers import StudentSerializer, StudentGradeSerializer
 from teachers.serializers import TeacherSerializer
 from accounts.serializers import AccountSerializer
-from school.serializers import ClassroomSerializer
+from school.serializers import ClassroomSerializer, CourseSerializer
 from persons.serializers import AchievementSerializer
 
 from accounts.utils import create_account, update_account
 from students.utils import get_student
 from teachers.utils import get_teacher
-from school.utils import get_classroom
+from school.utils import get_classroom, get_course
 from persons.utils import get_achievement
 
 import logging
 logger = logging.getLogger(__name__)
 
 
+# Account
 class RegisterView(APIView):
     permission_classes = (IsAuthenticated, IsAdminUser)
 
@@ -62,6 +63,8 @@ class AccountListView(APIView):
         serializer = AccountSerializer(accounts, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+# Student
 
 class StudentListView(APIView):
     permission_classes = (IsAdminUser, IsAuthenticated)
@@ -101,6 +104,8 @@ class StudentDetailView(APIView):
 
 
 class StudentAchievementListView(APIView):
+    permission_classes = (IsAdminUser, IsAuthenticated)
+
     def get(self, request):
         students = Student.objects.filter(achievements__isnull=False).distinct()
         serializer = StudentAchievementSerializer(students, many=True)
@@ -108,6 +113,8 @@ class StudentAchievementListView(APIView):
 
 
 class StudentAchievementDetailView(APIView):
+    permission_classes = (IsAdminUser, IsAuthenticated)
+
     def get(self, request, pk):
         student = get_student(pk)
         serializer = StudentAchievementSerializer(student)
@@ -125,6 +132,16 @@ class StudentAchievementDetailView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class StudentGradeView(APIView):
+    permission_classes = (IsAdminUser, IsAuthenticated)
+
+    def get(self, request, pk):
+        student = get_student(pk)
+        serializer = StudentGradeSerializer(student)
+        return Response(serializer.data)
+
+
+# Teacher
 class TeacherListView(APIView):
     permission_classes = (IsAdminUser, IsAuthenticated)
 
@@ -164,6 +181,8 @@ class TeacherDetailView(APIView):
 
 
 class TeacherAchievementListView(APIView):
+    permission_classes = (IsAdminUser, IsAuthenticated)
+
     def get(self, request):
         teachers = Teacher.objects.filter(achievements__isnull=False).distinct()
         serializer = TeacherAchievementSerializer(teachers, many=True)
@@ -171,6 +190,8 @@ class TeacherAchievementListView(APIView):
 
 
 class TeacherAchievementDetailView(APIView):
+    permission_classes = (IsAdminUser, IsAuthenticated)
+
     def get(self, request, pk):
         teacher = get_student(pk)
         serializer = TeacherAchievementSerializer(student)
@@ -178,7 +199,7 @@ class TeacherAchievementDetailView(APIView):
 
     def put(self, request, pk):
         teacher = get_teacher(pk)
-        serializer = TeacehrAchievementSerializer(teacher, data=request.data)
+        serializer = TeacherAchievementSerializer(teacher, data=request.data)
         try:
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -186,6 +207,8 @@ class TeacherAchievementDetailView(APIView):
 
         except serializers.ValidationError:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# Classroom
 
 
 class ClassroomListView(APIView):
@@ -226,7 +249,51 @@ class ClassroomDetailView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# Course
+
+class CourseListView(APIView):
+    permission_classes = (IsAdminUser, IsAuthenticated)
+
+    def get(self, request):
+        courses = Course.objects.all()
+        serializer = CourseSerializer(courses, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        course = CourseSerializer(data=request.data)
+        try:
+            course.is_valid(raise_exception=True)
+            course.save()
+            return Response(course.data, status=status.HTTP_201_CREATED)
+        except serializers.ValidationError:
+            return Response(course.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CourseDetailView(APIView):
+    permission_classes = (IsAdminUser, IsAuthenticated)
+
+    def get(self, request, pk):
+        course = get_course(pk)
+        serializer = CourseSerializer(course)
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        course = get_course(pk)
+        serializer = CourseSerializer(course, data=request.data, partial=True)
+        try:
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
+
+        except serializers.ValidationError:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# Achievement
+
+
 class AchievementListView(APIView):
+    permission_classes = (IsAdminUser, IsAuthenticated)
+
     def get(self, request):
         achievements = Achievement.objects.all()
         serializer = AchievementSerializer(achievements, many=True)
@@ -243,6 +310,8 @@ class AchievementListView(APIView):
 
 
 class AchievementDetailView(APIView):
+    permission_classes = (IsAdminUser, IsAuthenticated)
+
     def get(self, request, pk):
         achievement = get_achievement(pk)
         serializer = AchievementSerializer(achievement)

@@ -1,9 +1,11 @@
 from rest_framework import serializers
 from accounts.serializers import AccountSerializer
 from persons.serializers import PersonSerializer, AchievementSerializer, HealthSerializer
-from school.serializers import ClassroomSerializer
+from school.serializers import ClassroomSerializer, CourseSerializer
+
 from .models import Student, Grade
 from school.models import Classroom
+
 from persons.utils import create_person, update_person, create_health, update_health, assign_health
 from accounts.utils import create_account, update_account
 from school.utils import assign_classroom_by_id, get_classroom
@@ -13,9 +15,11 @@ logger = logging.getLogger(__name__)
 
 
 class GradeSerializer(serializers.ModelSerializer):
+    course = CourseSerializer()
+
     class Meta:
         model = Grade
-        fields = ['id', 'course', 'school_year', 'term', 'quiz1', 'quiz2', 'quiz3', 'test', 'mid_term_test', 'final_term_test', 'start_update']
+        fields = ['id', 'course', 'school_year', 'term', 'quiz1', 'quiz2', 'quiz3', 'test', 'mid_term_test', 'final_test', 'start_update']
 
 
 class StudentSerializer(serializers.ModelSerializer):

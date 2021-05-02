@@ -18,7 +18,7 @@ from django.contrib.auth import get_user_model
 from students.serializers import StudentSerializer, StudentGradeSerializer, ParentSerializer, GradeSerializer
 from teachers.serializers import TeacherSerializer
 from accounts.serializers import AccountSerializer
-from school.serializers import ClassroomSerializer, CourseSerializer
+from school.serializers import ClassroomSerializer, CourseSerializer, TimetableSerializer
 from persons.serializers import AchievementSerializer
 
 from accounts.utils import create_account, update_account
@@ -152,6 +152,8 @@ class StudentGradeListView(APIView):
 
 
 class StudentGradeDetailView(APIView):
+    permission_classes = (IsAdminUser, IsAuthenticated)
+
     def get(self, request, student_pk, grade_pk):
         student = get_student(student_pk)
         grade = get_grade(student, grade_pk)
@@ -210,6 +212,7 @@ class ParentDetailView(APIView):
 
 
 # Teacher
+
 class TeacherListView(APIView):
     permission_classes = (IsAdminUser, IsAuthenticated)
 
@@ -355,6 +358,27 @@ class CourseDetailView(APIView):
 
         except serializers.ValidationError:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# Timetable
+class ClassTimetableView(APIView):
+    permission_classes = (IsAdminUser, IsAuthenticated)
+
+    def get(self, request, pk):
+        classroom = get_classroom(pk)
+        timetables = classroom.timetables.all()
+        serializer = TimetableSerializer(timetables, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, pk):
+        request.data.update({'classroom_id': pk})
+        timetable = TimetableSerializer(data=request.data)
+        try:
+            timetable.is_valid(raise_exception=True)
+            timetable.save()
+            return Response(timetable.data)
+        except serializers.ValidationError:
+            return Response(timetable.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # Achievement
 

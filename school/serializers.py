@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Classroom, Course, Timetable
+from .models import Classroom, Course, Timetable, ClassRecord
 from teachers.models import Teacher
 
 from teachers.serializers import TeacherSerializer
@@ -27,7 +27,7 @@ class CourseSerializer(serializers.ModelSerializer):
 
 
 class TimetableSerializer(serializers.ModelSerializer):
-    classroom_id = serializers.IntegerField()
+    classroom_id = serializers.IntegerField(write_only=True)
     teacher_id = serializers.IntegerField()
     course_id = serializers.IntegerField()
 
@@ -36,7 +36,16 @@ class TimetableSerializer(serializers.ModelSerializer):
         fields = ['id', 'classroom_id', 'teacher_id', 'course_id', 'day_of_week', 'shifts']
 
     def validate(self, data):
-        logger.error(data)
         validate_classroom_timetable(data['classroom_id'], data['day_of_week'], data['shifts'])
         validate_teacher_timetable(data['teacher_id'], data['day_of_week'], data['shifts'])
         return data
+
+
+class RecordSerializer(serializers.ModelSerializer):
+    classroom_id = serializers.IntegerField(write_only=True)
+    teacher_id = serializers.IntegerField()
+    course_id = serializers.IntegerField()
+
+    class Meta:
+        model = ClassRecord
+        fields = ['id', 'classroom_id', 'teacher_id', 'course_id', 'day_of_week', 'shifts', 'attendant', 'note']

@@ -1,5 +1,5 @@
 from rest_framework import exceptions
-from .models import Classroom, Course
+from .models import Classroom, Course, Timetable, ClassRecord
 
 
 def get_classroom(pk):
@@ -20,3 +20,19 @@ def get_course(pk):
         return Course.objects.get(pk=pk)
     except Course.DoesNotExist:
         raise exceptions.NotFound('Course does not exist')
+
+
+def get_timetable(pk):
+    try:
+        timetable = Timetable.objects.get(pk=pk)
+        return timetable
+    except Timetable.DoesNotExist:
+        raise exceptions.NotFound('Timetable does not exist')
+
+
+def get_record(pk):
+    try:
+        record = ClassRecord.objects.get(pk=pk)
+        return record
+    except ClassRecord.DoesNotExist:
+        raise exceptions.NotFound('Class record does not exist')

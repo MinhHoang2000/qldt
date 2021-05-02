@@ -18,8 +18,8 @@ def get_parent(pk):
         raise exceptions.NotFound('Parent does not exist')
 
 
-def get_grade(student, pk):
+def get_grade(pk):
     try:
-        return student.grades.get(pk=pk)
+        return Grade.objects.get(pk=pk)
     except Grade.DoesNotExist:
         raise exceptions.NotFound('Grade does not exist')

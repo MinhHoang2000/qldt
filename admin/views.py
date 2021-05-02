@@ -24,7 +24,7 @@ from persons.serializers import AchievementSerializer
 from accounts.utils import create_account, update_account
 from students.utils import get_student, get_parent, get_grade
 from teachers.utils import get_teacher
-from school.utils import get_classroom, get_course
+from school.utils import get_classroom, get_course, get_timetable, get_record
 from persons.utils import get_achievement
 
 import logging
@@ -154,14 +154,12 @@ class StudentGradeDetailView(APIView):
     permission_classes = (IsAdminUser, IsAuthenticated)
 
     def get(self, request, student_pk, grade_pk):
-        student = get_student(student_pk)
-        grade = get_grade(student, grade_pk)
+        grade = get_grade(grade_pk)
         serializer = GradeSerializer(grade)
         return Response(serializer.data)
 
     def put(self, request, student_pk, grade_pk):
-        student = get_student(student_pk)
-        grade = get_grade(student, grade_pk)
+        grade = get_grade(grade_pk)
         serializer = GradeSerializer(grade, data=request.data, partial=True)
         try:
             serializer.is_valid(raise_exception=True)
@@ -367,14 +365,34 @@ class ClassTimetableView(APIView):
 
     def post(self, request, pk):
         request.data.update({'classroom_id': pk})
-
+        timetable = TimetableSerializer(data=request.data)
         try:
-            timetable = TimetableSerializer(data=request.data)
             timetable.is_valid(raise_exception=True)
             timetable.save()
             return Response(timetable.data, status=status.HTTP_201_CREATED)
         except serializers.ValidationError:
             return Response(timetable.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ClassTimetableDetailView(APIView):
+    permission_classes = (IsAdminUser, IsAuthenticated)
+
+    def get(self, request, class_pk, timetable_pk):
+        timetable = get_timetable(timetable_pk)
+        serializer = TimetableSerializer(timetable)
+        return Response(serializer.data)
+
+    def put(self, request, class_pk, timetable_pk):
+        request.data.update({'classroom_id': class_pk})
+        timetable = get_timetable(timetable_pk)
+        serializer = TimetableSerializer(timetable, data=request.data, partial=True)
+        try:
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
+
+        except serializers.ValidationError:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Record
@@ -394,6 +412,26 @@ class ClassRecordView(APIView):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except serializers.ValidationError:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ClassRecordDetailView(APIView):
+    permission_classes = (IsAdminUser, IsAuthenticated)
+
+    def get(self, request, class_pk, record_pk):
+        record = get_record(record_pk)
+        serializer = RecordSerializer(record)
+        return Response(serializer.data)
+
+    def put(self, request, class_pk, record_pk):
+        record = get_record(record_pk)
+        serializer = RecordSerializer(record, data=request.data, partial=True)
+        try:
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
+
         except serializers.ValidationError:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

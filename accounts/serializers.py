@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model, password_validation
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from rest_framework import serializers
-from rest_framework.authtoken.models import Token
+from rest_framework_simplejwt.tokens import RefreshToken
 from students.models import Student
 from teachers.models import Teacher
 
@@ -60,10 +60,13 @@ class AuthAccountSerializer(serializers.ModelSerializer):
         model = user
         fields = ['id', 'username', 'is_admin', 'token']
 
-    def get_token(self, obj):
-        if Token.objects.filter(user=obj):
-            return Token.objects.get(user=obj).key
-        return Token.objects.create(user=obj).key
+    def get_token(self, user):
+        refresh = RefreshToken.for_user(user)
+
+        return {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        }
 
 
 class ChangePasswordSerializer(serializers.Serializer):

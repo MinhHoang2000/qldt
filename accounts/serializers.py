@@ -5,7 +5,7 @@ from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 from students.models import Student
 from teachers.models import Teacher
-
+from .models import Permission
 user = get_user_model()
 
 
@@ -101,3 +101,10 @@ class TeacherProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Teacher
         fields = ['id', 'person', 'account_type']
+
+
+class PermissionSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Permission
+        fields = ['id', 'permission_name', 'permission_code']

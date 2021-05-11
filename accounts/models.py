@@ -12,7 +12,7 @@ from django.contrib.auth.models import _user_has_perm
 class Permission(models.Model):
     id = models.AutoField(primary_key=True)
     permission_name = models.CharField(max_length=128)
-    permission_code = models.CharField(max_length=4)
+    permission_code = models.CharField(max_length=32)
 
     class Meta:
         db_table = 'permission'

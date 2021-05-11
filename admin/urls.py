@@ -5,6 +5,7 @@ urlpatterns = [
     path('update', UpdateView.as_view()),
     path('register', RegisterView.as_view()),
     path('accounts', AccountListView.as_view()),
+    path('accounts/permissions', PermissionView.as_view()),
 
     # student
     path('students', StudentListView.as_view()),

@@ -9,6 +9,7 @@ from django.contrib.auth import get_user_model
 
 from .serializers import *
 
+from accounts.models import Permission
 from students.models import Student, Parent
 from teachers.models import Teacher
 from school.models import Classroom, Course
@@ -17,7 +18,7 @@ from django.contrib.auth import get_user_model
 
 from students.serializers import StudentSerializer, StudentGradeSerializer, ParentSerializer, GradeSerializer
 from teachers.serializers import TeacherSerializer
-from accounts.serializers import AccountSerializer
+from accounts.serializers import AccountSerializer, PermissionSerializer
 from school.serializers import ClassroomSerializer, CourseSerializer, TimetableSerializer, RecordSerializer
 from persons.serializers import AchievementSerializer
 
@@ -62,6 +63,24 @@ class AccountListView(APIView):
         accounts = get_user_model().objects.all()
         serializer = AccountSerializer(accounts, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class PermissionView(APIView):
+    permissions = (IsAdminUser, IsAuthenticated)
+
+    def get(self, request):
+        permissions = Permission.objects.all()
+        serializer = PermissionSerializer(permissions, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = PermissionSerializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except serializers.ValidationError:
+            return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Student

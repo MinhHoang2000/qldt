@@ -23,16 +23,6 @@ class LoginView(APIView):
             return Response('Account does not exist', status=status.HTTP_401_UNAUTHORIZED)
 
 
-class LogoutView(APIView):
-    permission_classes = (IsAuthenticated, )
-
-    def get(self, request):
-        user = request.user.auth_token.delete()
-        logout(request)
-
-        return Response('Loggout successfully', status=status.HTTP_200_OK)
-
-
 class ChangePasswordView(APIView):
     permission_classes = (IsAuthenticated,)
 

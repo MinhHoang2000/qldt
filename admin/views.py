@@ -1,5 +1,5 @@
 from rest_framework.views import APIView
-
+from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from accounts.permissions import IsOwner
 
@@ -61,6 +61,14 @@ class AccountListView(APIView):
 
     def get(self, request):
         accounts = get_user_model().objects.all()
+
+        username = request.query_params.get('username')
+        id = request.query_params.get('id')
+        if username is not None:
+            accounts = accounts.filter(username=username)
+        if id is not None:
+            accounts = accounts.filter(id=int(id))
+
         serializer = AccountSerializer(accounts, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

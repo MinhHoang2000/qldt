@@ -2,8 +2,11 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
+    # admin account
     path('update', UpdateView.as_view()),
     path('register', RegisterView.as_view()),
+
+    # account
     path('accounts', AccountListView.as_view()),
     path('accounts/permissions', PermissionView.as_view()),
 

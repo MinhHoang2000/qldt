@@ -9,11 +9,11 @@ from .models import Permission
 user = get_user_model()
 
 
-class AccountSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=128, required=True)
-    password = serializers.CharField(required=True, write_only=True)
-    email = serializers.CharField(required=False)
-    is_admin = serializers.BooleanField(required=False)
+class AccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = user
+        fields = ['id', 'username', 'email', 'is_admin']
+        extra_kwargs = {'email': {'required': False}, 'password': {'write_only': True}}
 
     def create(self, validated_data):
         if self.context.get('is_admin', False):
@@ -45,7 +45,7 @@ class AccountSerializer(serializers.Serializer):
             raise serializers.ValidationError('This username is already taken')
         return value
 
-    def validate_password(sefl, value):
+    def validate_password(self, value):
         try:
             password_validation.validate_password(value)
         except ValidationError:

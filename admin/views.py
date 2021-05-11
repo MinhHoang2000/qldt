@@ -5,9 +5,11 @@ from accounts.permissions import IsOwner
 
 from rest_framework import status, serializers
 from rest_framework.response import Response
+
 from django.contrib.auth import get_user_model
 
 from .serializers import *
+from config.pagination import Pagination, PaginationHandlerMixin
 
 from accounts.models import Permission
 from students.models import Student, Parent
@@ -56,8 +58,9 @@ class UpdateView(APIView):
         return Response(status=status.HTTP_200_OK)
 
 
-class AccountListView(APIView):
+class AccountView(APIView, PaginationHandlerMixin):
     permission_classes = (IsAdminUser, IsAuthenticated)
+    pagination_class = Pagination
 
     def get(self, request):
         accounts = get_user_model().objects.all()
@@ -70,6 +73,11 @@ class AccountListView(APIView):
             accounts = accounts.filter(id=int(id))
 
         serializer = AccountSerializer(accounts, many=True)
+        page = self.paginate_queryset(accounts)
+        if page is not None:
+            serializer = self.get_paginated_response(AccountSerializer(page, many=True).data)
+
+        # response = {'accounts': serializer.data, 'total': get_user_model().objects.count()}
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -92,7 +100,7 @@ class PermissionView(APIView):
 
 
 # Student
-class StudentListView(APIView):
+class StudentListView(APIView, PaginationHandlerMixin):
     permission_classes = (IsAdminUser, IsAuthenticated)
 
     def get(self, request):

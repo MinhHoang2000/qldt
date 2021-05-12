@@ -155,7 +155,7 @@ class StudentView(APIView, PaginationHandlerMixin):
 
 
 class StudentAchievementListView(APIView):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+    # permission_classes = (IsAdminUser, IsAuthenticated)
 
     def get(self, request):
         students = Student.objects.filter(achievements__isnull=False).distinct()
@@ -164,7 +164,7 @@ class StudentAchievementListView(APIView):
 
 
 class StudentAchievementDetailView(APIView):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+    # permission_classes = (IsAdminUser, IsAuthenticated)
 
     def get(self, request, pk):
         student = get_student(pk)
@@ -184,7 +184,7 @@ class StudentAchievementDetailView(APIView):
 
 
 class StudentGradeListView(APIView):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+    # permission_classes = (IsAdminUser, IsAuthenticated)
 
     def get(self, request, pk):
         student = get_student(pk)
@@ -367,12 +367,21 @@ class ClassroomDetailView(APIView):
 
 
 # Course
-class CourseListView(APIView):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+class CourseView(APIView, PaginationHandlerMixin):
+    # permission_classes = (IsAdminUser, IsAuthenticated)
+    pagination_class = Pagination
 
     def get(self, request):
         courses = Course.objects.all()
+
+        id = request.query_params.get('id')
+        if id is not None:
+            courses = courses.filter(id=id)
         serializer = CourseSerializer(courses, many=True)
+
+        page = self.paginate_queryset(courses)
+        if page is not None:
+            serializer = self.get_paginated_response(CourseSerializer(page, many=True).data)
         return Response(serializer.data)
 
     def post(self, request):
@@ -384,25 +393,19 @@ class CourseListView(APIView):
         except serializers.ValidationError:
             return Response(course.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-class CourseDetailView(APIView):
-    permission_classes = (IsAdminUser, IsAuthenticated)
-
-    def get(self, request, pk):
-        course = get_course(pk)
-        serializer = CourseSerializer(course)
-        return Response(serializer.data)
-
-    def put(self, request, pk):
-        course = get_course(pk)
-        serializer = CourseSerializer(course, data=request.data, partial=True)
-        try:
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data)
-
-        except serializers.ValidationError:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def put(self, request):
+        id = request.query_params.get('id')
+        if id is not None:
+            course = get_course(id)
+            serializer = CourseSerializer(course, data=request.data, partial=True)
+            try:
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return Response(serializer.data)
+            except serializers.ValidationError:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Timetable
@@ -524,34 +527,3 @@ class AchievementDetailView(APIView):
             return Response(serializer.data)
         except serializers.ValidationError:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-{
-    "person": {
-        "first_name": "Tham lam",
-        "last_name": "Ngu dot",
-        "gender": "M",
-        "date_of_birth": "2000-01-01",
-        "address": "ui23g2ui"
-    },
-    "account": {
-        "username": "t1",
-        "password": "hailong123"
-    },
-    "admission_year": 2018,
-    "status": "DH",
-    "classroom_id": 1
-}
-
-
-{
-    "class_name": "12A",
-    "location": "230B",
-    "homeroom_teacher_id": 1
-}
-
-{
-    "person": {
-        "gender": "F"
-    }
-}

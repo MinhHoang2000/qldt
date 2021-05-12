@@ -32,8 +32,7 @@ urlpatterns = [
     path('classrooms/<int:class_pk>/records/<record_pk>', ClassRecordDetailView.as_view()),
 
     # course
-    path('courses', CourseListView.as_view()),
-    path('courses/<int:pk>', CourseDetailView.as_view()),
+    path('courses', CourseView.as_view()),
 
     # achievements
     path('achievements', AchievementListView.as_view()),

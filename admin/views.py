@@ -77,16 +77,21 @@ class AccountView(APIView, PaginationHandlerMixin):
         if page is not None:
             serializer = self.get_paginated_response(AccountSerializer(page, many=True).data)
 
-        # response = {'accounts': serializer.data, 'total': get_user_model().objects.count()}
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class PermissionView(APIView):
+class PermissionView(APIView, PaginationHandlerMixin):
     permissions = (IsAdminUser, IsAuthenticated)
+    pagination_class = Pagination
 
     def get(self, request):
         permissions = Permission.objects.all()
+
         serializer = PermissionSerializer(permissions, many=True)
+        page = self.paginate_queryset(permissions)
+        if page is not None:
+            serializer = self.get_paginated_response(PermissionSerializer(page, many=True).data)
+
         return Response(serializer.data)
 
     def post(self, request):
@@ -100,12 +105,28 @@ class PermissionView(APIView):
 
 
 # Student
-class StudentListView(APIView, PaginationHandlerMixin):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+class StudentView(APIView, PaginationHandlerMixin):
+    # permission_classes = (IsAdminUser, IsAuthenticated)
+    pagination_class = Pagination
 
     def get(self, request):
         students = Student.objects.all()
+
+        # query_set
+        id = request.query_params.get('id')
+        status = request.query_params.get('status')
+        admission_year = request.query_params.get('admission_year')
+        if id is not None:
+            students = students.filter(id=int(id))
+        if status is not None:
+            students = students.filter(status=status)
+        if admission_year is not None:
+            students = students.filter(admission_year=admission_year)
+
         serializer = StudentSerializer(students, many=True)
+        page = self.paginate_queryset(students)
+        if page is not None:
+            serializer = self.get_paginated_response(StudentSerializer(page, many=True).data)
         return Response(serializer.data)
 
     def post(self, request):
@@ -117,24 +138,20 @@ class StudentListView(APIView, PaginationHandlerMixin):
         except serializers.ValidationError:
             return Response(student.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def put(self, request):
+        id = request.query_params.get('id')
+        if id is not None:
+            student = get_student(id)
+            serializer = StudentSerializer(student, data=request.data, partial=True)
+            try:
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            except serializers.ValidationError:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class StudentDetailView(APIView):
-    permission_classes = (IsAdminUser, IsAuthenticated)
-
-    def get(self, request, pk):
-        student = get_student(pk)
-        serializer = StudentSerializer(student)
-        return Response(serializer.data)
-
-    def put(self, request, pk):
-        student = get_student(pk)
-        serializer = StudentSerializer(student, data=request.data, partial=True)
-        try:
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except serializers.ValidationError:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            Response({'id query need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class StudentAchievementListView(APIView):
@@ -244,7 +261,7 @@ class ParentDetailView(APIView):
 
 # Teacher
 class TeacherListView(APIView):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+    # permission_classes = (IsAdminUser, IsAuthenticated)
 
     def get(self, request):
         teachers = Teacher.objects.all()
@@ -312,7 +329,7 @@ class TeacherAchievementDetailView(APIView):
 
 # Classroom
 class ClassroomListView(APIView):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+    # permission_classes = (IsAdminUser, IsAuthenticated)
 
     def get(self, request):
         classrooms = Classroom.objects.all()
@@ -507,3 +524,34 @@ class AchievementDetailView(APIView):
             return Response(serializer.data)
         except serializers.ValidationError:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+{
+    "person": {
+        "first_name": "Tham lam",
+        "last_name": "Ngu dot",
+        "gender": "M",
+        "date_of_birth": "2000-01-01",
+        "address": "ui23g2ui"
+    },
+    "account": {
+        "username": "t1",
+        "password": "hailong123"
+    },
+    "admission_year": 2018,
+    "status": "DH",
+    "classroom_id": 1
+}
+
+
+{
+    "class_name": "12A",
+    "location": "230B",
+    "homeroom_teacher_id": 1
+}
+
+{
+    "person": {
+        "gender": "F"
+    }
+}

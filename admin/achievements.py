@@ -19,7 +19,7 @@ from teachers.utils import get_teacher
 
 
 class AchievementView(APIView, PaginationHandlerMixin):
-    # permission_classes = (IsAdminUser, IsAuthenticated)
+    permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -62,7 +62,7 @@ class AchievementView(APIView, PaginationHandlerMixin):
 
 
 class StudentAchievementView(APIView, PaginationHandlerMixin):
-    # permission_classes = (IsAdminUser, IsAuthenticated)
+    permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -96,7 +96,7 @@ class StudentAchievementView(APIView, PaginationHandlerMixin):
 
 
 class TeacherAchievementView(APIView, PaginationHandlerMixin):
-    # permission_classes = (IsAdminUser, IsAuthenticated)
+    permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):

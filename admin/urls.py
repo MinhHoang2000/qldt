@@ -15,8 +15,7 @@ urlpatterns = [
     path('students/grades', StudentGradeView.as_view()),
 
     # parent
-    path('parents', ParentListView.as_view()),
-    path('parents/<int:pk>', ParentDetailView.as_view()),
+    path('parents', ParentView.as_view()),
 
     # teacher
     path('teachers', TeacherListView.as_view()),

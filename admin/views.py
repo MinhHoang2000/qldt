@@ -101,44 +101,6 @@ class PermissionView(APIView, PaginationHandlerMixin):
             return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
 
 
-# Parent
-class ParentListView(APIView):
-    permission_classes = (IsAdminUser, IsAuthenticated)
-
-    def get(self, request):
-        parents = Parent.objects.all()
-        serializer = ParentSerializer(parents, many=True)
-        return Response(serializer.data)
-
-    def post(self, request):
-        parent = ParentSerializer(data=request.data)
-        try:
-            parent.is_valid(raise_exception=True)
-            parent.save()
-            return Response(data=parent.data, status=status.HTTP_201_CREATED)
-        except serializers.ValidationError:
-            return Response(parent.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class ParentDetailView(APIView):
-    permission_classes = (IsAdminUser, IsAuthenticated)
-
-    def get(self, request, pk):
-        parent = get_parent(pk)
-        serializer = ParentSerializer(student)
-        return Response(serializer.data)
-
-    def put(self, request, pk):
-        parent = get_parent(pk)
-        serializer = ParentSerializer(parent, data=request.data, partial=True)
-        try:
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except serializers.ValidationError:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 # Teacher
 class TeacherListView(APIView):
     # permission_classes = (IsAdminUser, IsAuthenticated)

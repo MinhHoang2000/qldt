@@ -10,8 +10,9 @@ from students.serializers import StudentSerializer, ParentSerializer, GradeSeria
 from students.utils import get_student, get_parent, get_grade
 
 
+# Student
 class StudentView(APIView, PaginationHandlerMixin):
-    # permission_classes = (IsAdminUser, IsAuthenticated)
+    permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -30,7 +31,7 @@ class StudentView(APIView, PaginationHandlerMixin):
 
         serializer = StudentSerializer(students, many=True)
 
-        #paginate
+        # paginate
         page = self.paginate_queryset(students)
         if page:
             serializer = self.get_paginated_response(StudentSerializer(page, many=True).data)
@@ -59,11 +60,11 @@ class StudentView(APIView, PaginationHandlerMixin):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         else:
-            Response({'id query need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
+            Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class StudentGradeView(APIView, PaginationHandlerMixin):
-    # permission_classes = (IsAdminUser, IsAuthenticated)
+    permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -81,13 +82,13 @@ class StudentGradeView(APIView, PaginationHandlerMixin):
 
             serializer = GradeSerializer(grades)
 
-            #paginate
+            # paginate
             page = self.paginate_queryset(grades)
             if page:
                 serializer = self.get_paginated_response(GradeSerializer(page, many=True).data)
             return Response(serializer.data)
         else:
-            return Response({'student id param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'student id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request):
         student_id = request.query_params.get('student_id')
@@ -100,7 +101,7 @@ class StudentGradeView(APIView, PaginationHandlerMixin):
             except serializers.ValidationError:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response({'student id param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'student id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request):
         # Need id
@@ -115,33 +116,47 @@ class StudentGradeView(APIView, PaginationHandlerMixin):
             except serializers.ValidationError:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response('grade_id query params need to be provided', status=status.HTTP_400_BAD_REQUEST)
+            return Response('grade_id query param need to be provided', status=status.HTTP_400_BAD_REQUEST)
 
 
-class StudentAchievementListView(APIView):
+# Parent
+class ParentView(APIView, PaginationHandlerMixin):
     # permission_classes = (IsAdminUser, IsAuthenticated)
+    pagination_class = Pagination
 
     def get(self, request):
-        students = Student.objects.filter(achievements__isnull=False).distinct()
-        serializer = StudentAchievementSerializer(students, many=True)
+        parents = Parent.objects.all()
+        id = request.query_params.get('id')
+        if id:
+            parents = parents.filter(id=id)
+
+        serializer = ParentSerializer(parents, many=True)
+        page = self.paginate_queryset(parents)
+        if page:
+            serializer = self.get_paginated_response(ParentSerializer(page, many=True).data)
+
         return Response(serializer.data)
 
-
-class StudentAchievementDetailView(APIView):
-    # permission_classes = (IsAdminUser, IsAuthenticated)
-
-    def get(self, request, pk):
-        student = get_student(pk)
-        serializer = StudentAchievementSerializer(student)
-        return Response(serializer.data)
-
-    def put(self, request, pk):
-        student = get_student(pk)
-        serializer = StudentAchievementSerializer(student, data=request.data)
+    def post(self, request):
+        parent = ParentSerializer(data=request.data)
         try:
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
+            parent.is_valid(raise_exception=True)
+            parent.save()
+            return Response(data=parent.data, status=status.HTTP_201_CREATED)
         except serializers.ValidationError:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(parent.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request):
+        id = request.query_params.get('id')
+        if id:
+            parent = get_parent(id)
+            serializer = ParentSerializer(parent, data=request.data, partial=True)
+            try:
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            except serializers.ValidationError:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        else:
+            return Response('id query param need to be provided', status=status.HTTP_400_BAD_REQUEST)

@@ -7,7 +7,7 @@ from config.pagination import Pagination, PaginationHandlerMixin
 
 from students.models import Student, Parent, Grade
 from students.serializers import StudentSerializer, ParentSerializer, GradeSerializer
-from students.utils import get_student, get_parent, get_grade, delete_student
+from students.utils import get_student, get_parent, get_grade, delete_student, delete_grade, delete_parent
 
 
 # Student
@@ -126,6 +126,15 @@ class StudentGradeView(APIView, PaginationHandlerMixin):
         else:
             return Response('grade_id query param need to be provided', status=status.HTTP_400_BAD_REQUEST)
 
+    def delete(self, request):
+        # Need id
+        grade_id = request.query_params.get('grade_id')
+        if grade_id:
+            delete_grade(id)
+            return Response({'Delete successful'})
+        else:
+            return Response('grade_id query param need to be provided', status=status.HTTP_400_BAD_REQUEST)
+
 
 # Parent
 class ParentView(APIView, PaginationHandlerMixin):
@@ -166,5 +175,13 @@ class ParentView(APIView, PaginationHandlerMixin):
             except serializers.ValidationError:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+        else:
+            return Response('id query param need to be provided', status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request):
+        id = request.query_params.get('id')
+        if id:
+            delete_parent(id)
+            return Response({'Delete successful'})
         else:
             return Response('id query param need to be provided', status=status.HTTP_400_BAD_REQUEST)

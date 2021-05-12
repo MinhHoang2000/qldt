@@ -13,13 +13,13 @@ from teachers.models import Teacher
 from .serializers import StudentAchievementSerializer, TeacherAchievementSerializer
 from persons.serializers import AchievementSerializer
 
-from persons.utils import get_achievement
+from persons.utils import get_achievement, delete_achievement
 from students.utils import get_student
 from teachers.utils import get_teacher
 
 
 class AchievementView(APIView, PaginationHandlerMixin):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+    # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -57,6 +57,14 @@ class AchievementView(APIView, PaginationHandlerMixin):
             except serializers.ValidationError:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+        else:
+            return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request):
+        id = request.query_params.get('id')
+        if id:
+            delete_achievement(id)
+            return Response("Delete successful")
         else:
             return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
 

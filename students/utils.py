@@ -22,8 +22,16 @@ def get_parent(pk):
         raise exceptions.NotFound('Parent does not exist')
 
 
+def delete_parent(pk):
+    return get_parent(pk).delete()
+
+
 def get_grade(pk):
     try:
         return Grade.objects.get(pk=pk)
     except Grade.DoesNotExist:
         raise exceptions.NotFound('Grade does not exist')
+
+
+def delete_grade(pk):
+    return get_grade(pk).delete()

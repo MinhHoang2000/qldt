@@ -48,3 +48,7 @@ def update_achievement(achievement, achievement_data):
     achievement_serializer = AchievementSerializer(achievement, data=achievement_data, partial=True)
     achievement_serializer.is_valid(raise_exception=True)
     achievement_serializer.save()
+
+
+def delete_achievement(pk):
+    return get_achievement(pk).delete()

@@ -38,9 +38,17 @@ def get_timetable(pk):
         raise exceptions.NotFound('Timetable does not exist')
 
 
+def delete_timetable(pk):
+    return get_timetable(pk).delete()
+
+
 def get_record(pk):
     try:
         record = ClassRecord.objects.get(pk=pk)
         return record
     except ClassRecord.DoesNotExist:
         raise exceptions.NotFound('Class record does not exist')
+
+
+def delete_record(pk):
+    return get_record(pk).delete()

@@ -6,7 +6,7 @@ from config.pagination import Pagination, PaginationHandlerMixin
 
 from school.models import Classroom
 from school.serializers import ClassroomSerializer, TimetableSerializer, RecordSerializer
-from school.utils import get_classroom, get_timetable, get_record
+from school.utils import get_classroom, get_timetable, get_record, delete_timetable, delete_record
 
 # Classroom
 
@@ -118,8 +118,17 @@ class ClassTimetableView(APIView, PaginationHandlerMixin):
         else:
             return Response({'time_id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
 
+    def delete(self, request):
+        time_id = request.query_params.get('time_id')
+        if time_id:
+            delete_timetable(time_id)
+            return Response({'Delete successful'})
+        else:
+            return Response({'time_id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
 
 # Record
+
+
 class ClassRecordView(APIView, PaginationHandlerMixin):
     # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
@@ -177,5 +186,13 @@ class ClassRecordView(APIView, PaginationHandlerMixin):
 
             except serializers.ValidationError:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'record_id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request):
+        record_id = request.query_params.get('record')
+        if record_id:
+            delete_record(record_id)
+            return Response({'Delete successful'})
         else:
             return Response({'record_id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)

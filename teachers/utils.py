@@ -21,3 +21,7 @@ def update_teacher(teacher, teacher_data):
     teacher_serializer = TeacherSerializer(teacher, data=teacher_data)
     teacher_serializer.is_valid(raise_exception=True)
     teacher_serializer.save()
+
+
+def delete_teacher(pk):
+    return get_teacher(pk).delete()

@@ -18,8 +18,7 @@ urlpatterns = [
     path('parents', ParentView.as_view()),
 
     # teacher
-    path('teachers', TeacherListView.as_view()),
-    path('teachers/<int:pk>', TeacherDetailView.as_view()),
+    path('teachers', TeacherView.as_view()),
 
     # classroom
     path('classrooms', ClassroomListView.as_view()),

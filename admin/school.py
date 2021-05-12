@@ -7,7 +7,7 @@ from config.pagination import Pagination, PaginationHandlerMixin
 
 from school.models import Course
 from school.serializers import CourseSerializer
-from school.utils import get_course
+from school.utils import get_course, delete_course
 
 
 class CourseView(APIView, PaginationHandlerMixin):
@@ -47,5 +47,13 @@ class CourseView(APIView, PaginationHandlerMixin):
                 return Response(serializer.data)
             except serializers.ValidationError:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request):
+        id = request.query_params.get('id')
+        if id is not None:
+            delete_couse(id)
+            return Response('Delete successful')
         else:
             return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)

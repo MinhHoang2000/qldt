@@ -26,6 +26,10 @@ def get_course(pk):
         raise exceptions.NotFound('Course does not exist')
 
 
+def delete_course(pk):
+    return get_course(pk).delete()
+
+
 def get_timetable(pk):
     try:
         timetable = Timetable.objects.get(pk=pk)

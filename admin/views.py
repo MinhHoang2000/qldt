@@ -13,19 +13,19 @@ from config.pagination import Pagination, PaginationHandlerMixin
 from accounts.models import Permission
 from teachers.models import Teacher
 from school.models import Classroom, Course
-from persons.models import Achievement
 from django.contrib.auth import get_user_model
 
 from teachers.serializers import TeacherSerializer
 from accounts.serializers import AccountSerializer, PermissionSerializer
 from school.serializers import ClassroomSerializer, CourseSerializer, TimetableSerializer, RecordSerializer
-from persons.serializers import AchievementSerializer
 
 from accounts.utils import create_account, update_account
 from teachers.utils import get_teacher
 from school.utils import get_classroom, get_course, get_timetable, get_record
-from persons.utils import get_achievement
 
+
+from .students import *
+from .achievements import *
 
 import logging
 logger = logging.getLogger(__name__)
@@ -169,35 +169,6 @@ class TeacherDetailView(APIView):
     def put(self, request, pk):
         teacher = self.get_teacher(pk)
         serializer = TeacherSerializer(teacher, data=request.data, partial=True)
-        try:
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
-        except serializers.ValidationError:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class TeacherAchievementListView(APIView):
-    permission_classes = (IsAdminUser, IsAuthenticated)
-
-    def get(self, request):
-        teachers = Teacher.objects.filter(achievements__isnull=False).distinct()
-        serializer = TeacherAchievementSerializer(teachers, many=True)
-        return Response(serializer.data)
-
-
-class TeacherAchievementDetailView(APIView):
-    permission_classes = (IsAdminUser, IsAuthenticated)
-
-    def get(self, request, pk):
-        teacher = get_student(pk)
-        serializer = TeacherAchievementSerializer(student)
-        return Response(serializer.data)
-
-    def put(self, request, pk):
-        teacher = get_teacher(pk)
-        serializer = TeacherAchievementSerializer(teacher, data=request.data)
         try:
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -369,47 +340,3 @@ class ClassRecordDetailView(APIView):
 
         except serializers.ValidationError:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-# Achievement
-class AchievementView(APIView, PaginationHandlerMixin):
-    # permission_classes = (IsAdminUser, IsAuthenticated)
-    pagination_class = Pagination
-
-    def get(self, request):
-        achievements = Achievement.objects.all()
-
-        # queryset
-        id = request.query_params.get('id')
-        if id:
-            achievements = achievements.filter(id=id)
-
-        serializer = AchievementSerializer(achievements, many=True)
-        page = self.paginate_queryset(achievements)
-        if page:
-            serializer = self.get_paginated_response(AchievementSerializer(page, many=True).data)
-        return Response(serializer.data)
-
-    def post(self, request):
-        achievement = AchievementSerializer(data=request.data)
-        try:
-            achievement.is_valid(raise_exception=True)
-            achievement.save()
-            return Response(achievement.data, status=status.HTTP_201_CREATED)
-        except serializers.ValidationError:
-            return Response(achievement.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def put(self, request):
-        id = request.query_params.get('id')
-        if id:
-            achievement = get_achievement(id)
-            serializer = AchievementSerializer(achievement, data=request.data, partial=True)
-            try:
-                serializer.is_valid(raise_exception=True)
-                serializer.save()
-                return Response(serializer.data)
-            except serializers.ValidationError:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        else:
-            return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)

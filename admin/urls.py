@@ -1,6 +1,5 @@
 from django.urls import path
 from .views import *
-from .students import *
 
 urlpatterns = [
     # admin account
@@ -36,8 +35,6 @@ urlpatterns = [
 
     # achievements
     path('achievements', AchievementView.as_view()),
-    path('achievements/students', StudentAchievementListView.as_view()),
-    path('achievements/students/<int:pk>', StudentAchievementDetailView.as_view()),
-    path('achievements/teachers', TeacherAchievementListView.as_view()),
-    path('achievements/teachers/<int:pk>', TeacherAchievementDetailView.as_view()),
+    path('achievements/students', StudentAchievementView.as_view()),
+    path('achievements/teachers', TeacherAchievementView.as_view()),
 ]

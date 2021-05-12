@@ -79,11 +79,15 @@ class AccountView(APIView, PaginationHandlerMixin):
 
 
 class PermissionView(APIView, PaginationHandlerMixin):
-    permissions = (IsAdminUser, IsAuthenticated)
+    # permissions = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
         permissions = Permission.objects.all()
+
+        id = request.query_params.get('id')
+        if id:
+            permissions = permissions.filter(id=id)
 
         serializer = PermissionSerializer(permissions, many=True)
         page = self.paginate_queryset(permissions)
@@ -100,6 +104,15 @@ class PermissionView(APIView, PaginationHandlerMixin):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except serializers.ValidationError:
             return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request):
+        id = request.query_params.get('id')
+        if id:
+            delete_permission(id)
+            return Response("Delete successful")
+        else:
+            return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 # Teacher

@@ -1,5 +1,6 @@
 from .serializers import AccountSerializer
 from django.contrib.auth import get_user_model
+from .models import Permission
 from rest_framework import exceptions
 
 
@@ -8,6 +9,13 @@ def get_account(id):
         return get_user_model().objects.get(id=id)
     except get_user_model().DoesNotExist:
         raise exceptions.NotFound("Account does not exist")
+
+
+def get_permission(id):
+    try:
+        return Permission.objects.get(id=id)
+    except get_user_model().DoesNotExist:
+        raise exceptions.NotFound("Permission does not exist")
 
 
 def create_account(account_data, is_admin=False):
@@ -24,3 +32,7 @@ def update_account(account, account_data):
 
 def delete_account(id):
     return get_account(id).delete()
+
+
+def delete_permission(id):
+    return get_permission(id).delete()

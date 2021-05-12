@@ -72,6 +72,7 @@ class RecordSerializer(serializers.ModelSerializer):
         day_of_week = validated_data.get('day_of_week')
         shifts = validated_data.get('shifts')
         study_week = validated_data.get('study_week')
+        attendant = validated_data.get('attendant')
         validate_classroom_record(classroom_id, day_of_week, shifts, study_week)
         validate_classroom_attendant(classroom_id, attendant)
         return ClassRecord.objects.create(**validated_data)

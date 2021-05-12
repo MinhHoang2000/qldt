@@ -10,6 +10,10 @@ def get_student(pk):
         raise exceptions.NotFound('Student does not exist')
 
 
+def delete_student(pk):
+    return get_student(pk).delete()
+
+
 def get_parent(pk):
     try:
         parent = Parent.objects.get(pk=pk)

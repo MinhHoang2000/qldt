@@ -7,12 +7,12 @@ from config.pagination import Pagination, PaginationHandlerMixin
 
 from students.models import Student, Parent, Grade
 from students.serializers import StudentSerializer, ParentSerializer, GradeSerializer
-from students.utils import get_student, get_parent, get_grade
+from students.utils import get_student, get_parent, get_grade, delete_student
 
 
 # Student
 class StudentView(APIView, PaginationHandlerMixin):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+    # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -62,9 +62,17 @@ class StudentView(APIView, PaginationHandlerMixin):
         else:
             Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
 
+    def delete(self, request):
+        id = request.query_params.get('id')
+        if id:
+            delete_student(id)
+            return Response({'Delete successful'})
+        else:
+            return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class StudentGradeView(APIView, PaginationHandlerMixin):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+    # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -80,7 +88,7 @@ class StudentGradeView(APIView, PaginationHandlerMixin):
             if school_year:
                 grades = grades.filter(school_year=school_year)
 
-            serializer = GradeSerializer(grades)
+            serializer = GradeSerializer(grades, many=True)
 
             # paginate
             page = self.paginate_queryset(grades)

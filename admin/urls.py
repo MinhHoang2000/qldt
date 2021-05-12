@@ -8,7 +8,7 @@ urlpatterns = [
 
     # account
     path('accounts', AccountView.as_view()),
-    path('accounts/permissions', PermissionView.as_view()),
+    path('permissions', PermissionView.as_view()),
 
     # student
     path('students', StudentView.as_view()),

@@ -21,8 +21,7 @@ urlpatterns = [
     path('teachers', TeacherView.as_view()),
 
     # classroom
-    path('classrooms', ClassroomListView.as_view()),
-    path('classrooms/<int:pk>', ClassroomDetailView.as_view()),
+    path('classrooms', ClassroomView.as_view()),
     path('classrooms/<int:pk>/timetables', ClassTimetableView.as_view()),
     path('classrooms/<int:class_pk>/timetables/<int:timetable_pk>', ClassTimetableDetailView.as_view()),
     path('classrooms/<int:pk>/records', ClassRecordView.as_view()),

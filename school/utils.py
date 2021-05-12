@@ -10,6 +10,10 @@ def get_classroom(pk):
         raise exceptions.NotFound('Classroom does not exist')
 
 
+def delete_classroom(pk):
+    return get_classroom(pk).delete()
+
+
 def assign_classroom_by_id(student, class_pk):
     classroom = Classroom.objects.get(pk=class_pk)
     student.classroom = classroom

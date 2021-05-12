@@ -1,6 +1,5 @@
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
-from accounts.permissions import IsOwner
 
 from rest_framework import status, serializers
 from rest_framework.response import Response
@@ -25,7 +24,7 @@ from school.utils import get_classroom, get_course, get_timetable, get_record
 from .students import *
 from .teachers import *
 from .achievements import *
-
+from .classrooms import *
 
 import logging
 logger = logging.getLogger(__name__)
@@ -112,45 +111,6 @@ class PermissionView(APIView, PaginationHandlerMixin):
             return Response("Delete successful")
         else:
             return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
-
-
-# Classroom
-class ClassroomListView(APIView):
-    # permission_classes = (IsAdminUser, IsAuthenticated)
-
-    def get(self, request):
-        classrooms = Classroom.objects.all()
-        serializer = ClassroomSerializer(classrooms, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def post(self, request):
-        classroom = ClassroomSerializer(data=request.data)
-        try:
-            classroom.is_valid(raise_exception=True)
-            classroom.save()
-            return Response(classroom.data, status=status.HTTP_201_CREATED)
-
-        except serializers.ValidationError:
-            return Response(classroom.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class ClassroomDetailView(APIView):
-    permission_classes = (IsAdminUser, IsAuthenticated)
-
-    def get(self, request, pk):
-        classroom = get_classroom(pk)
-        serializer = ClassroomSerializer(classroom)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def put(self, request, pk):
-        classroom = get_classroom(pk)
-        serializer = ClassroomSerializer(classroom, data=request.data, partial=True)
-        try:
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except serializers.ValidationError:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Course

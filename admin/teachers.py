@@ -6,7 +6,7 @@ from config.pagination import Pagination, PaginationHandlerMixin
 
 from teachers.models import Teacher
 from teachers.serializers import TeacherSerializer
-from teachers.utils import get_teacher
+from teachers.utils import get_teacher, delete_teacher
 
 
 class TeacherView(APIView, PaginationHandlerMixin):
@@ -50,11 +50,10 @@ class TeacherView(APIView, PaginationHandlerMixin):
         else:
             return Response({'id query param need to be provide'})
 
-
     def delete(self, request):
         id = request.query_params.get('id')
         if id:
             delete_teacher(id)
             return Response({'Delete successful'})
         else:
-           return Response({'id query param need to be provide'})
+            return Response({'id query param need to be provide'})

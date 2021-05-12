@@ -59,7 +59,7 @@ class StudentView(APIView, PaginationHandlerMixin):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         else:
-            Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request):
         id = request.query_params.get('id')

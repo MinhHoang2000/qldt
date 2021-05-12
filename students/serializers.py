@@ -29,9 +29,9 @@ class GradeSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Course does not exist')
 
     def create(self, validated_data):
-        student = self.context['student']
+        student_id = self.context['student_id']
         course = get_course(validated_data.pop('course_id'))
-        return Grade.objects.create(course=course, student=student, **validated_data)
+        return Grade.objects.create(course=course, student_id=student_id, **validated_data)
 
 
 class StudentSerializer(serializers.ModelSerializer):
@@ -88,23 +88,6 @@ class StudentSerializer(serializers.ModelSerializer):
         instance.admission_year = validated_data.get('admission_year', instance.admission_year)
         instance.save()
         return instance
-
-
-class StudentGradeSerializer(serializers.ModelSerializer):
-    grades = GradeSerializer(many=True)
-
-    class Meta:
-        model = Student
-        fields = ['grades']
-
-    def create(self, validated_data):
-        student = self.context['student']
-
-        for grade_data in validated_data.pop('grades'):
-            grade = GradeSerializer(data=grade_data, context={'student': student})
-            grade.is_valid(raise_exception=True)
-            grade.save()
-        return student
 
 
 class ParentSerializer(serializers.ModelSerializer):

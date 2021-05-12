@@ -23,7 +23,7 @@ class StudentView(APIView, PaginationHandlerMixin):
         status = request.query_params.get('status')
         admission_year = request.query_params.get('admission_year')
         if id:
-            students = students.filter(id=int(id))
+            students = students.filter(id=id)
         if status:
             students = students.filter(status=status)
         if admission_year:

@@ -19,7 +19,7 @@ from teachers.serializers import TeacherSerializer
 from accounts.serializers import AccountSerializer, PermissionSerializer
 from school.serializers import ClassroomSerializer, CourseSerializer, TimetableSerializer, RecordSerializer
 
-from accounts.utils import create_account, update_account
+from accounts.utils import create_account, update_account, delete_account
 from teachers.utils import get_teacher
 from school.utils import get_classroom, get_course, get_timetable, get_record
 
@@ -36,22 +36,15 @@ class RegisterView(APIView):
     permission_classes = (IsAuthenticated, IsAdminUser)
 
     def post(self, request):
-        try:
-            create_account(request.data, is_admin=True)
-        except serializers.ValidationError:
-            return Response(account.errors, status=status.HTTP_400_BAD_REQUEST)
+        account = create_account(request.data, is_admin=True)
         return Response(status=status.HTTP_200_OK)
 
 
 class UpdateView(APIView):
     permission_classes = (IsAdminUser, IsAuthenticated)
 
-    def post(self, request):
-        try:
-            update_account(request.user, request.data)
-        except serializers.ValidationError:
-            return Response(account.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    def put(self, request):
+        update_account(request.user, request.data)
         return Response(status=status.HTTP_200_OK)
 
 
@@ -64,10 +57,10 @@ class AccountView(APIView, PaginationHandlerMixin):
 
         username = request.query_params.get('username')
         id = request.query_params.get('id')
-        if username is not None:
+        if username:
             accounts = accounts.filter(username=username)
-        if id is not None:
-            accounts = accounts.filter(id=int(id))
+        if id:
+            accounts = accounts.filter(id=id)
 
         serializer = AccountSerializer(accounts, many=True)
         page = self.paginate_queryset(accounts)
@@ -75,6 +68,14 @@ class AccountView(APIView, PaginationHandlerMixin):
             serializer = self.get_paginated_response(AccountSerializer(page, many=True).data)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def delete(self, request):
+        id = request.query_params.get('id')
+        if id:
+            delete_account(id)
+            return Response("Delete successful")
+        else:
+            return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PermissionView(APIView, PaginationHandlerMixin):

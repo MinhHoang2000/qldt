@@ -2,6 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.parsers import FileUploadParser, JSONParser, MultiPartParser
 from rest_framework import status, serializers
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
 from rest_framework.response import Response
 from config.pagination import Pagination, PaginationHandlerMixin
 
@@ -9,9 +11,15 @@ from school.models import Course, Device, FileManage
 from school.serializers import CourseSerializer, DeviceSerializer, DeviceManageSerializer, FileManageSerializer
 from school.utils import get_course, delete_course, get_device, delete_device, get_device_manage, get_file, delete_file
 
+from config import settings
+import os
+import mimetypes
+from django.http import HttpResponse
 
+
+# Course
 class CourseView(APIView, PaginationHandlerMixin):
-    # permission_classes = (IsAdminUser, IsAuthenticated)
+    permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -59,8 +67,9 @@ class CourseView(APIView, PaginationHandlerMixin):
             return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
 
 
+# Device
 class DeviceView(APIView, PaginationHandlerMixin):
-    # permission_classes = (IsAdminUser, IsAuthenticated)
+    permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -110,7 +119,7 @@ class DeviceView(APIView, PaginationHandlerMixin):
 
 
 class DeviceManageView(APIView, PaginationHandlerMixin):
-    # permission_classes = (IsAdminUser, IsAuthenticated)
+    permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -167,8 +176,9 @@ class DeviceManageView(APIView, PaginationHandlerMixin):
             return Response({'device_manage_id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
 
 
+# File
 class FileManageView(APIView, PaginationHandlerMixin):
-    # permission_classes = (IsAdminUser, IsAuthenticated)
+    permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
     parser_classes = (JSONParser, MultiPartParser, FileUploadParser)
 
@@ -217,3 +227,19 @@ class FileManageView(APIView, PaginationHandlerMixin):
             return Response({'Delete successful'})
         else:
             return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', ])
+@permission_classes([IsAuthenticated, IsAdminUser, ])
+def download(request, pk):
+    f = get_file(pk)
+    filepath = os.path.join(settings.BASE_DIR, f.file.path)
+    if os.path.exists(filepath):
+        filename = os.path.basename(filepath)
+        mimetype = mimetypes.guess_type(filepath)
+        with open(filepath, 'rb') as f:
+            response = HttpResponse(f.read(), content_type=mimetype)
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            return response
+    else:
+        return Response({'File not found'}, status=status.HTTP_404_NOT_FOUND)

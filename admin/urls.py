@@ -39,4 +39,5 @@ urlpatterns = [
 
     # file
     path('files', FileManageView.as_view()),
+    path('download/<int:pk>', download)
 ]

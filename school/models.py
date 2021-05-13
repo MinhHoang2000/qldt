@@ -1,6 +1,7 @@
 from django.db import models
 from accounts.models import Account
 from teachers.models import Teacher
+from datetime import datetime
 
 DAY_OF_WEEK = [('Mon', 'Monday'),
                ('Tue', 'Tuesday'),
@@ -81,10 +82,18 @@ class DeviceManage(models.Model):
         db_table = 'device_manage'
 
 
+def teacher_directory_path(instance, filename):
+    now = datetime.now()
+    year = now.year
+    month = now.month
+    day = now.day
+    return f'documents/{instance.teacher.id}/{year}/{month}/{day}/{filename}'
+
+
 class FileManage(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=128)
-    file = models.FileField()
+    file = models.FileField(upload_to=teacher_directory_path)
     study_week = models.SmallIntegerField()
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, related_name='files')
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='files')

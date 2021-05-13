@@ -1,13 +1,13 @@
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
-
+from rest_framework.parsers import FileUploadParser, JSONParser, MultiPartParser
 from rest_framework import status, serializers
 from rest_framework.response import Response
 from config.pagination import Pagination, PaginationHandlerMixin
 
-from school.models import Course, Device
-from school.serializers import CourseSerializer, DeviceSerializer, DeviceManageSerializer
-from school.utils import get_course, delete_course, get_device, delete_device, get_device_manage
+from school.models import Course, Device, FileManage
+from school.serializers import CourseSerializer, DeviceSerializer, DeviceManageSerializer, FileManageSerializer
+from school.utils import get_course, delete_course, get_device, delete_device, get_device_manage, get_file, delete_file
 
 
 class CourseView(APIView, PaginationHandlerMixin):
@@ -167,19 +167,53 @@ class DeviceManageView(APIView, PaginationHandlerMixin):
             return Response({'device_manage_id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-# class FileManageView(APIView, PaginationHandlerMixin):
-#     # permission_classes = (IsAdminUser, IsAuthenticated)
-#     paginate_class = Pagination
+class FileManageView(APIView, PaginationHandlerMixin):
+    # permission_classes = (IsAdminUser, IsAuthenticated)
+    pagination_class = Pagination
+    parser_classes = (JSONParser, MultiPartParser, FileUploadParser)
 
-#     def get(self, request):
-#         files = FileManage.objects.all()
-#         id = request.query_params.get('id')
-#         if file_id:
-#             files = files.filter(id=id)
+    def get(self, request):
+        files = FileManage.objects.all()
+        id = request.query_params.get('id')
+        if id:
+            files = files.filter(id=id)
 
-#         serializer = FileManageSerializer(files, many=True)
+        serializer = FileManageSerializer(files, many=True)
 
-#         page = self.paginate_queryset(devices)
-#         if page:
-#             serializer = self.get_paginated_response(DeviceSerializer(page, many=True).data)
+        page = self.paginate_queryset(files)
+        if page:
+            serializer = self.get_paginated_response(FileManageSerializer(page, many=True).data)
 
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = FileManageSerializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response('Upload file successful')
+        except serializers.ValidationError:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request):
+        id = request.query_params.get('id')
+        if id:
+            file = get_file(id)
+            serializer = FileManageSerializer(file, data=request.data, partial=True)
+            try:
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return Response(serializer.data)
+
+            except serializers.ValidationError:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request):
+        id = request.query_params.get('id')
+        if id:
+            file = delete_file(id)
+            return Response({'Delete successful'})
+        else:
+            return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)

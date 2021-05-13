@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Classroom, Course, Timetable, ClassRecord, Device, DeviceManage
+from .models import Classroom, Course, Timetable, ClassRecord, Device, DeviceManage, FileManage
 from teachers.models import Teacher
 
 from teachers.serializers import TeacherSerializer
@@ -135,3 +135,12 @@ class DeviceManageSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+
+class FileManageSerializer(serializers.ModelSerializer):
+    teacher_id = serializers.IntegerField()
+    course_id = serializers.IntegerField()
+
+    class Meta:
+        model = FileManage
+        fields = ['id', 'name', 'file', 'study_week', 'teacher_id', 'course_id']

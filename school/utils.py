@@ -1,5 +1,7 @@
+from rest_framework import serializers
 from rest_framework import exceptions
-from .models import Classroom, Course, Timetable, ClassRecord, Device, DeviceManage
+from .models import Classroom, Course, Timetable, ClassRecord, Device, DeviceManage, FileManage
+import os
 
 
 def get_classroom(pk):
@@ -76,3 +78,19 @@ def get_device_manage(pk):
 
 def delete_device_manage(pk):
     return get_device_manage(pk).delete()
+
+
+def get_file(pk):
+    try:
+        return FileManage.objects.get(pk=pk)
+    except FileManage.DoesNotExist:
+        raise exceptions.NotFound('File does not exist')
+
+
+def delete_file(pk):
+    f = get_file(pk)
+    try:
+        os.remove(f.file.path)
+    except FileNotFoundError:
+        raise serializers.ValidationError('File not found')
+    return f.delete()

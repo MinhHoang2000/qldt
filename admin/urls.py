@@ -35,4 +35,5 @@ urlpatterns = [
 
     # device
     path('devices', DeviceView.as_view()),
+    path('device_manage', DeviceManageView.as_view()),
 ]

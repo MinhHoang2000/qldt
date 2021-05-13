@@ -96,8 +96,8 @@ class ClassTimetableView(APIView, PaginationHandlerMixin):
                 timetable.is_valid(raise_exception=True)
                 timetable.save()
                 return Response(timetable.data, status=status.HTTP_201_CREATED)
-            except serializers.ValidationError:
-                return Response(timetable.errors, status=status.HTTP_400_BAD_REQUEST)
+            except serializers.ValidationError as error:
+                return Response(error.detail, status=status.HTTP_400_BAD_REQUEST)
 
         else:
             return Response({'class_id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
@@ -112,8 +112,8 @@ class ClassTimetableView(APIView, PaginationHandlerMixin):
                 serializer.save()
                 return Response(serializer.data)
 
-            except serializers.ValidationError:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            except serializers.ValidationError as error:
+                return Response(error.detail, status=status.HTTP_400_BAD_REQUEST)
 
         else:
             return Response({'time_id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
@@ -169,8 +169,8 @@ class ClassRecordView(APIView, PaginationHandlerMixin):
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
-            except serializers.ValidationError:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            except serializers.ValidationError as error:
+                return Response(error.detail, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({'class_id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -184,8 +184,8 @@ class ClassRecordView(APIView, PaginationHandlerMixin):
                 serializer.save()
                 return Response(serializer.data)
 
-            except serializers.ValidationError:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            except serializers.ValidationError as error:
+                return Response(error.detail, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({'record_id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
 

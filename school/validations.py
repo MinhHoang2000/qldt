@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from .utils import get_classroom
-from .models import Timetable, ClassRecord
+from .utils import get_classroom, get_device
+from .models import Timetable, ClassRecord, DeviceManage
 from teachers.utils import get_teacher
 
 
@@ -35,3 +35,13 @@ def validate_classroom_attendant(classroom_id, attendant):
     classroom = get_classroom(classroom_id)
     if attendant > classroom.students.count():
         raise serializers.ValidationError('Attendant can\'t be larger than total student')
+
+
+def validate_device_manage(device_id, week, day_of_week, shifts):
+    device = get_device(device_id)
+    device_manage = DeviceManage.objects.filter(device=device,
+                                                week=week,
+                                                day_of_week=day_of_week,
+                                                shifts=shifts)
+    if device_manage.exists():
+        raise serializers.ValidationError(f'Device schedule conflicts at Week: {week} | {day_of_week} | {shifts}')

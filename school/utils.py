@@ -1,5 +1,5 @@
 from rest_framework import exceptions
-from .models import Classroom, Course, Timetable, ClassRecord, Device
+from .models import Classroom, Course, Timetable, ClassRecord, Device, DeviceManage
 
 
 def get_classroom(pk):
@@ -64,3 +64,15 @@ def get_device(pk):
 
 def delete_device(pk):
     return get_device(pk).delete()
+
+
+def get_device_manage(pk):
+    try:
+        device_manage = DeviceManage.objects.get(pk=pk)
+        return device_manage
+    except DeviceManage.DoesNotExist:
+        raise exceptions.NotFound('Device schedule does not exist')
+
+
+def delete_device_manage(pk):
+    return get_device_manage(pk).delete()

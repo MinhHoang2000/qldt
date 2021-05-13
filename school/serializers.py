@@ -1,11 +1,11 @@
 from rest_framework import serializers
 
-from .models import Classroom, Course, Timetable, ClassRecord, Device
+from .models import Classroom, Course, Timetable, ClassRecord, Device, DeviceManage
 from teachers.models import Teacher
 
 from teachers.serializers import TeacherSerializer
 
-from .validations import validate_classroom_timetable, validate_teacher_timetable, validate_classroom_record, validate_classroom_attendant
+from .validations import validate_classroom_timetable, validate_teacher_timetable, validate_classroom_record, validate_classroom_attendant, validate_device_manage
 import logging
 logger = logging.getLogger(__name__)
 
@@ -101,3 +101,37 @@ class DeviceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Device
         fields = '__all__'
+
+
+class DeviceManageSerializer(serializers.ModelSerializer):
+    device_id = serializers.IntegerField(write_only=True)
+    account_id = serializers.CharField(max_length=36)
+
+    class Meta:
+        model = DeviceManage
+        fields = ['id', 'day_of_week', 'week', 'shifts', 'account_id', 'device_id']
+
+    def create(self, validated_data):
+        device_id = validated_data.get('device_id')
+        week = validated_data.get('week')
+        day_of_week = validated_data.get('day_of_week')
+        shifts = validated_data.get('shifts')
+        account_id = validated_data.get('account_id')
+        validate_device_manage(device_id, week, day_of_week, shifts)
+        return DeviceManage.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        account_id = validated_data.get('account_id', instance.account_id)
+        week = validated_data.get('week', instance.week)
+        day_of_week = validated_data.get('day_of_week', instance.day_of_week)
+        shifts = validated_data.get('shifts', instance.shifts)
+
+        validate_device_manage(instance.device_id, week, day_of_week, shifts)
+
+        instance.account_id = account_id
+        instance.week = week
+        instance.day_of_week = day_of_week
+        instance.shifts = shifts
+
+        instance.save()
+        return instance

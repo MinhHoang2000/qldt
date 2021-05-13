@@ -12,7 +12,7 @@ user = get_user_model()
 class AccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = user
-        fields = ['id', 'username', 'email', 'is_admin']
+        fields = ['id', 'username', 'email', 'is_admin', 'password']
         extra_kwargs = {'email': {'required': False}, 'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -58,11 +58,12 @@ class AuthAccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = user
-        fields = ['id', 'username', 'is_admin', 'token']
+        fields = ['token']
 
     def get_token(self, user):
         refresh = RefreshToken.for_user(user)
-
+        refresh['username'] = user.username
+        refresh['is_admin'] = user.is_admin
         return {
             'refresh': str(refresh),
             'access': str(refresh.access_token),

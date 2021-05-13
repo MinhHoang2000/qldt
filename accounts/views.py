@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .serializers import *
-from django.contrib.auth import authenticate, get_user_model, logout
+from django.contrib.auth import authenticate, get_user_model
 from rest_framework.authtoken.models import Token
 
 class LoginView(APIView):

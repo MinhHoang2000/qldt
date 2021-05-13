@@ -53,7 +53,7 @@ INSTALLED_APPS = [
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
     'ACCESS_TOKEN_LIFETIME': timedelta(days=7),
-
+    'AUTH_HEADER_TYPES': ('Bearer', 'Token'),
     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=30),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=7),
 }

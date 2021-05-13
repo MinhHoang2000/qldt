@@ -1,5 +1,5 @@
 from rest_framework import exceptions
-from .models import Classroom, Course, Timetable, ClassRecord
+from .models import Classroom, Course, Timetable, ClassRecord, Device
 
 
 def get_classroom(pk):
@@ -52,3 +52,15 @@ def get_record(pk):
 
 def delete_record(pk):
     return get_record(pk).delete()
+
+
+def get_device(pk):
+    try:
+        device = Device.objects.get(pk=pk)
+        return device
+    except Device.DoesNotExist:
+        raise exceptions.NotFound('Device does not exist')
+
+
+def delete_device(pk):
+    return get_device(pk).delete()

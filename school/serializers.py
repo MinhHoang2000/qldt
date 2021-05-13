@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Classroom, Course, Timetable, ClassRecord
+from .models import Classroom, Course, Timetable, ClassRecord, Device
 from teachers.models import Teacher
 
 from teachers.serializers import TeacherSerializer
@@ -95,3 +95,9 @@ class RecordSerializer(serializers.ModelSerializer):
     def get_total_student(self, obj):
         total = obj.classroom.students.count()
         return total
+
+
+class DeviceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Device
+        fields = '__all__'

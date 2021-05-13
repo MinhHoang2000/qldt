@@ -32,4 +32,7 @@ urlpatterns = [
     path('achievements', AchievementView.as_view()),
     path('achievements/students', StudentAchievementView.as_view()),
     path('achievements/teachers', TeacherAchievementView.as_view()),
+
+    # device
+    path('devices', DeviceView.as_view()),
 ]

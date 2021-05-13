@@ -11,7 +11,7 @@ from students.utils import get_student, get_parent, get_grade, delete_student, d
 
 # Student
 class StudentView(APIView, PaginationHandlerMixin):
-    # permission_classes = (IsAdminUser, IsAuthenticated)
+    permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -71,7 +71,7 @@ class StudentView(APIView, PaginationHandlerMixin):
 
 
 class StudentGradeView(APIView, PaginationHandlerMixin):
-    # permission_classes = (IsAdminUser, IsAuthenticated)
+    permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -137,7 +137,7 @@ class StudentGradeView(APIView, PaginationHandlerMixin):
 
 # Parent
 class ParentView(APIView, PaginationHandlerMixin):
-    # permission_classes = (IsAdminUser, IsAuthenticated)
+    permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):

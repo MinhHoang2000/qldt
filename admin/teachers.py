@@ -10,7 +10,7 @@ from teachers.utils import get_teacher, delete_teacher
 
 
 class TeacherView(APIView, PaginationHandlerMixin):
-    # permission_classes = (IsAdminUser, IsAuthenticated)
+    permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):

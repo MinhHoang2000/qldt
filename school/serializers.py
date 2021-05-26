@@ -97,12 +97,6 @@ class RecordSerializer(serializers.ModelSerializer):
         return total
 
 
-class DeviceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Device
-        fields = '__all__'
-
-
 class DeviceManageSerializer(serializers.ModelSerializer):
     device_id = serializers.IntegerField(write_only=True)
     account_id = serializers.CharField(max_length=36)
@@ -135,6 +129,14 @@ class DeviceManageSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+
+class DeviceSerializer(serializers.ModelSerializer):
+    device_manages = DeviceManageSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Device
+        fields = ['status', 'device_name', 'device_manages']
 
 
 class FileManageSerializer(serializers.ModelSerializer):

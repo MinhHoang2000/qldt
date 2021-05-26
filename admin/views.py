@@ -12,7 +12,7 @@ from django.contrib.auth import get_user_model
 
 from accounts.serializers import AccountSerializer, PermissionSerializer
 
-from accounts.utils import create_account, update_account, delete_account
+from accounts.utils import create_account, update_account, delete_account, delete_permission
 
 from .students import *
 from .teachers import *
@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 # Account
 class RegisterView(APIView):
-    permission_classes = (IsAuthenticated, IsAdminUser)
+    # permission_classes = (IsAuthenticated, IsAdminUser)
 
     def post(self, request):
         account = create_account(request.data, is_admin=True)
@@ -34,7 +34,7 @@ class RegisterView(APIView):
 
 
 class UpdateView(APIView):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+    # permission_classes = (IsAdminUser, IsAuthenticated)
 
     def put(self, request):
         update_account(request.user, request.data)
@@ -42,7 +42,7 @@ class UpdateView(APIView):
 
 
 class AccountView(APIView, PaginationHandlerMixin):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+    # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -72,7 +72,7 @@ class AccountView(APIView, PaginationHandlerMixin):
 
 
 class PermissionView(APIView, PaginationHandlerMixin):
-    permissions = (IsAdminUser, IsAuthenticated)
+    # permissions = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):

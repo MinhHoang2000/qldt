@@ -19,7 +19,7 @@ from django.http import HttpResponse
 
 # Course
 class CourseView(APIView, PaginationHandlerMixin):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+    # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -69,7 +69,7 @@ class CourseView(APIView, PaginationHandlerMixin):
 
 # Device
 class DeviceView(APIView, PaginationHandlerMixin):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+    # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -119,7 +119,7 @@ class DeviceView(APIView, PaginationHandlerMixin):
 
 
 class DeviceManageView(APIView, PaginationHandlerMixin):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+    # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -178,7 +178,7 @@ class DeviceManageView(APIView, PaginationHandlerMixin):
 
 # File
 class FileManageView(APIView, PaginationHandlerMixin):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+    # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
     parser_classes = (JSONParser, MultiPartParser, FileUploadParser)
 

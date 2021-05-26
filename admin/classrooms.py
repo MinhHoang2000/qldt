@@ -12,7 +12,7 @@ from school.utils import get_classroom, get_timetable, get_record, delete_timeta
 
 
 class ClassroomView(APIView, PaginationHandlerMixin):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+    # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -64,7 +64,7 @@ class ClassroomView(APIView, PaginationHandlerMixin):
 
 # Timetable
 class ClassTimetableView(APIView, PaginationHandlerMixin):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+    # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -130,7 +130,7 @@ class ClassTimetableView(APIView, PaginationHandlerMixin):
 
 
 class ClassRecordView(APIView, PaginationHandlerMixin):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+    # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):

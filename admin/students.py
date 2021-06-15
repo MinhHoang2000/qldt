@@ -21,12 +21,16 @@ class StudentView(APIView, PaginationHandlerMixin):
         id = request.query_params.get('id')
         status = request.query_params.get('status')
         admission_year = request.query_params.get('admission_year')
+        sort = request.query_params.get('sort_by')
+
         if id:
             students = students.filter(id=id)
         if status:
             students = students.filter(status=status)
         if admission_year:
             students = students.filter(admission_year=admission_year)
+        if sort:
+            students = students.order_by(f'{sort}')
 
         serializer = StudentSerializer(students, many=True)
 
@@ -82,10 +86,14 @@ class StudentGradeView(APIView, PaginationHandlerMixin):
             # query_set
             term = request.query_params.get('term')
             school_year = request.query_params.get('school_year')
+            sort = request.query_params.get('sort_by')
+
             if term:
                 grades = grades.filter(term=term)
             if school_year:
                 grades = grades.filter(school_year=school_year)
+            if sort:
+                grades = grades.order_by(f'{sort}')
 
             serializer = GradeSerializer(grades, many=True)
 
@@ -143,8 +151,11 @@ class ParentView(APIView, PaginationHandlerMixin):
     def get(self, request):
         parents = Parent.objects.all()
         id = request.query_params.get('id')
+        sort = request.query_params.get('sort_by')
         if id:
             parents = parents.filter(id=id)
+        if sort:
+            parents = parents.order_by(f'{sort}')
 
         serializer = ParentSerializer(parents, many=True)
         page = self.paginate_queryset(parents)

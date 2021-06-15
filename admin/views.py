@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 # Account
 class RegisterView(APIView):
-    # permission_classes = (IsAuthenticated, IsAdminUser)
+    permission_classes = (IsAuthenticated, IsAdminUser)
 
     def post(self, request):
         account = create_account(request.data, is_admin=True)
@@ -34,7 +34,7 @@ class RegisterView(APIView):
 
 
 class UpdateView(APIView):
-    # permission_classes = (IsAdminUser, IsAuthenticated)
+    permission_classes = (IsAdminUser, IsAuthenticated)
 
     def put(self, request):
         update_account(request.user, request.data)
@@ -42,7 +42,7 @@ class UpdateView(APIView):
 
 
 class AccountView(APIView, PaginationHandlerMixin):
-    # permission_classes = (IsAdminUser, IsAuthenticated)
+    permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -50,10 +50,14 @@ class AccountView(APIView, PaginationHandlerMixin):
 
         username = request.query_params.get('username')
         id = request.query_params.get('id')
+        sort = request.query_params.get('sort_by')
+
         if username:
             accounts = accounts.filter(username=username)
         if id:
             accounts = accounts.filter(id=id)
+        if sort:
+            accounts = accounts.order_by(f'{sort}')
 
         serializer = AccountSerializer(accounts, many=True)
         page = self.paginate_queryset(accounts)
@@ -72,15 +76,18 @@ class AccountView(APIView, PaginationHandlerMixin):
 
 
 class PermissionView(APIView, PaginationHandlerMixin):
-    # permissions = (IsAdminUser, IsAuthenticated)
+    permissions = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
         permissions = Permission.objects.all()
 
         id = request.query_params.get('id')
+        sort = request.query_params.get('sort_by')
         if id:
             permissions = permissions.filter(id=id)
+        if sort:
+            permissions = permissions.order_by(f'{sort}')
 
         serializer = PermissionSerializer(permissions, many=True)
         page = self.paginate_queryset(permissions)

@@ -8,18 +8,23 @@ from school.models import Classroom
 from school.serializers import ClassroomSerializer, TimetableSerializer, RecordSerializer
 from school.utils import get_classroom, get_timetable, get_record, delete_timetable, delete_record
 
+
+
 # Classroom
-
-
 class ClassroomView(APIView, PaginationHandlerMixin):
-    # permission_classes = (IsAdminUser, IsAuthenticated)
+    permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
         classrooms = Classroom.objects.all()
+
+        # Query param for id or sort
         id = request.query_params.get('id')
+        sort = request.query_params.get('sort_by')
         if id:
             classrooms = classrooms.filter(id=id)
+        if sort:
+            classrooms = classrooms.order_by(f'{sort}')
 
         serializer = ClassroomSerializer(classrooms, many=True)
 
@@ -64,7 +69,7 @@ class ClassroomView(APIView, PaginationHandlerMixin):
 
 # Timetable
 class ClassTimetableView(APIView, PaginationHandlerMixin):
-    # permission_classes = (IsAdminUser, IsAuthenticated)
+    permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -73,6 +78,12 @@ class ClassTimetableView(APIView, PaginationHandlerMixin):
             classroom = get_classroom(class_id)
             timetables = classroom.timetables.all()
 
+            # Sort
+            sort = request.query_params.get('sort_by')
+            if sort:
+                timetables = timetables.order_by(f'{sort}')
+
+            # Get by id
             time_id = request.query_params.get('time_id')
             if time_id:
                 timetables = timetables.filter(id=time_id)
@@ -126,11 +137,11 @@ class ClassTimetableView(APIView, PaginationHandlerMixin):
         else:
             return Response({'time_id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
 
+
+
 # Record
-
-
 class ClassRecordView(APIView, PaginationHandlerMixin):
-    # permission_classes = (IsAdminUser, IsAuthenticated)
+    permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -138,15 +149,19 @@ class ClassRecordView(APIView, PaginationHandlerMixin):
         if class_id:
             classroom = get_classroom(class_id)
             records = classroom.classrecords.all()
-
             # query_set
             study_week = request.query_params.get('study_week')
             record_id = request.query_params.get('record_id')
+            sort = request.query_params.get('sort_by')
+
             if study_week:
                 records = records.filter(study_week=study_week)
 
             if record_id:
                 records = records.filter(id=record_id)
+
+            if sort:
+                records = records.order_by(f'{sort}')
 
             serializer = RecordSerializer(records, many=True)
 

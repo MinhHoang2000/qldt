@@ -19,17 +19,22 @@ from django.http import HttpResponse
 
 # Course
 class CourseView(APIView, PaginationHandlerMixin):
-    # permission_classes = (IsAdminUser, IsAuthenticated)
+    permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
         courses = Course.objects.all()
 
+        # Get query params for sort or id
         id = request.query_params.get('id')
+        sort = request.query_params.get('sort_by')
+
         if id:
             courses = courses.filter(id=id)
-        serializer = CourseSerializer(courses, many=True)
+        if sort:
+            courses = courses.order_by(f'{sort}')
 
+        serializer = CourseSerializer(courses, many=True)
         page = self.paginate_queryset(courses)
         if page:
             serializer = self.get_paginated_response(CourseSerializer(page, many=True).data)
@@ -69,14 +74,19 @@ class CourseView(APIView, PaginationHandlerMixin):
 
 # Device
 class DeviceView(APIView, PaginationHandlerMixin):
-    # permission_classes = (IsAdminUser, IsAuthenticated)
+    permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
         devices = Device.objects.all()
+
+        # Get query param for id or sort
         id = request.query_params.get('id')
+        sort = request.query_params.get('sort_by')
         if id:
             devices = devices.filter(id=id)
+        if sort:
+            devices = devices.order_by(f'{sort}')
 
         serializer = DeviceSerializer(devices, many=True)
         page = self.paginate_queryset(devices)
@@ -119,7 +129,7 @@ class DeviceView(APIView, PaginationHandlerMixin):
 
 
 class DeviceManageView(APIView, PaginationHandlerMixin):
-    # permission_classes = (IsAdminUser, IsAuthenticated)
+    permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -127,6 +137,11 @@ class DeviceManageView(APIView, PaginationHandlerMixin):
         if device_id:
             device = get_device(device_id)
             device_manages = device.device_manages.all()
+
+            # Get query param for sort
+            sort = request.query_params.get('sort_by')
+            if sort:
+                device_manages = device_manages.order_by(f'{sort}')
 
             serializer = DeviceManageSerializer(device_manages, many=True)
 
@@ -178,15 +193,21 @@ class DeviceManageView(APIView, PaginationHandlerMixin):
 
 # File
 class FileManageView(APIView, PaginationHandlerMixin):
-    # permission_classes = (IsAdminUser, IsAuthenticated)
+    permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
     parser_classes = (JSONParser, MultiPartParser, FileUploadParser)
 
     def get(self, request):
         files = FileManage.objects.all()
+
+        # Get query param for id or sort
         id = request.query_params.get('id')
+        sort = request.query_params.get('sort_by')
+
         if id:
             files = files.filter(id=id)
+        if sort:
+            files = files.order_by(f'{sort}')
 
         serializer = FileManageSerializer(files, many=True)
 

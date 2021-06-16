@@ -13,6 +13,7 @@ urlpatterns = [
     # student
     path('students', StudentView.as_view()),
     path('students/grades', StudentGradeView.as_view()),
+    path('students/conducts', StudentConductView.as_view()),
 
     # parent
     path('parents', ParentView.as_view()),
@@ -38,6 +39,6 @@ urlpatterns = [
     path('device_manage', DeviceManageView.as_view()),
 
     # file
-    path('files', FileManageView.as_view()),
+    path('studydoc', StudyDocumentView.as_view()),
     path('download/<int:pk>', download)
 ]

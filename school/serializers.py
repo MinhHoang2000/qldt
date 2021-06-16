@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Classroom, Course, Timetable, ClassRecord, Device, DeviceManage, FileManage
+from .models import Classroom, Course, Timetable, ClassRecord, Device, DeviceManage, StudyDocument
 from teachers.models import Teacher
 
 from teachers.serializers import TeacherSerializer
@@ -33,15 +33,18 @@ class TimetableSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Timetable
-        fields = ['id', 'classroom_id', 'teacher_id', 'course_id', 'day_of_week', 'shifts']
+        fields = ['id', 'classroom_id', 'teacher_id', 'course_id', 'day_of_week', 'shifts', 'semester', 'school_year']
 
     def create(self, validated_data):
         classroom_id = validated_data.get('classroom_id')
         teacher_id = validated_data.get('teacher_id')
         day_of_week = validated_data.get('day_of_week')
         shifts = validated_data.get('shifts')
-        validate_classroom_timetable(classroom_id, day_of_week, shifts)
-        validate_teacher_timetable(teacher_id, day_of_week, shifts)
+        semester = validated_data.get('semester')
+        school_year = validated_data.get('school_year')
+
+        validate_classroom_timetable(classroom_id, day_of_week, shifts, semester, school_year)
+        validate_teacher_timetable(teacher_id, day_of_week, shifts, semester, school_year)
 
         return Timetable.objects.create(**validated_data)
 
@@ -65,16 +68,20 @@ class RecordSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ClassRecord
-        fields = ['id', 'classroom_id', 'teacher_id', 'course_id', 'day_of_week', 'shifts', 'study_week', 'total_student', 'attendant', 'note']
+        fields = ['id', 'classroom_id', 'teacher_id', 'course_id', 'day_of_week', 'shifts', 'study_week', 'total_student', 'attendant', 'note', 'semester', 'school_year']
 
     def create(self, validated_data):
         classroom_id = validated_data.get('classroom_id')
         day_of_week = validated_data.get('day_of_week')
         shifts = validated_data.get('shifts')
         study_week = validated_data.get('study_week')
+        semester = validated_data.get('semester')
+        school_year = validated_data.get('school_year')
         attendant = validated_data.get('attendant')
-        validate_classroom_record(classroom_id, day_of_week, shifts, study_week)
+
+        validate_classroom_record(classroom_id, day_of_week, shifts, study_week, semester, school_year)
         validate_classroom_attendant(classroom_id, attendant)
+
         return ClassRecord.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
@@ -136,13 +143,14 @@ class DeviceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Device
-        fields = ['status', 'device_name', 'device_manages']
+        fields = ['status', 'device_name', 'device_manages', 'amount', 'price']
 
 
-class FileManageSerializer(serializers.ModelSerializer):
+class StudyDocumentSerializer(serializers.ModelSerializer):
     teacher_id = serializers.IntegerField()
     course_id = serializers.IntegerField()
+    classroom_id = serializers.IntegerField()
 
     class Meta:
-        model = FileManage
-        fields = ['id', 'name', 'file', 'study_week', 'teacher_id', 'course_id']
+        model = StudyDocument
+        fields = ['id', 'name', 'file', 'study_week', 'teacher_id', 'course_id', 'classroom_id']

@@ -4,14 +4,14 @@ from rest_framework import status, serializers
 from rest_framework.response import Response
 from config.pagination import Pagination, PaginationHandlerMixin
 
-from students.models import Student, Parent, Grade
-from students.serializers import StudentSerializer, ParentSerializer, GradeSerializer
-from students.utils import get_student, get_parent, get_grade, delete_student, delete_grade, delete_parent
+from students.models import Student, Parent, Grade, Conduct
+from students.serializers import StudentSerializer, ParentSerializer, GradeSerializer, ConductSerializer
+from students.utils import get_student, get_parent, get_grade, get_conduct, delete_student, delete_grade, delete_parent
 
 
 # Student
 class StudentView(APIView, PaginationHandlerMixin):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+    # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -141,6 +141,66 @@ class StudentGradeView(APIView, PaginationHandlerMixin):
             return Response({'Delete successful'})
         else:
             return Response('grade_id query param need to be provided', status=status.HTTP_400_BAD_REQUEST)
+
+class StudentConductView(APIView, PaginationHandlerMixin):
+    # permission_classes = (IsAdminUser, IsAuthenticated)
+    pagination_class = Pagination
+
+    def get(self, request):
+        conducts = Conduct.objects.all()
+
+        # query_set
+        term = request.query_params.get('term')
+        school_year = request.query_params.get('school_year')
+        sort = request.query_params.get('sort_by')
+
+        if term:
+            conducts = conducts.filter(term=term)
+        if school_year:
+            conducts = conducts.filter(school_year=school_year)
+        if sort:
+            conducts = conducts.order_by(f'{sort}')
+
+        serializer = ConductSerializer(conducts, many=True)
+
+        # paginate
+        page = self.paginate_queryset(conducts)
+        if page:
+            serializer = self.get_paginated_response(ConductSerializer(page, many=True).data)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = ConductSerializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except serializers.ValidationError:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request):
+        # Need id
+        id = request.query_params.get('id')
+        if id:
+            conduct = get_conduct(id)
+            serializer = ConductSerializer(conduct, data=request.data, partial=True)
+            try:
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return Response(serializer.data)
+            except serializers.ValidationError:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response('id query param need to be provided', status=status.HTTP_400_BAD_REQUEST)
+
+
+    def delete(self, request):
+        id = request.query_params.get('id')
+        if id:
+            delete_conduct(id)
+            return Response({'Delete successful'})
+        else:
+            return Response('id query param need to be provided', status=status.HTTP_400_BAD_REQUEST)
 
 
 # Parent

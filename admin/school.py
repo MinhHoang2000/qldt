@@ -7,8 +7,8 @@ from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
 from rest_framework.response import Response
 from config.pagination import Pagination, PaginationHandlerMixin
 
-from school.models import Course, Device, FileManage
-from school.serializers import CourseSerializer, DeviceSerializer, DeviceManageSerializer, FileManageSerializer
+from school.models import Course, Device, StudyDocument
+from school.serializers import CourseSerializer, DeviceSerializer, DeviceManageSerializer, StudyDocumentSerializer
 from school.utils import get_course, delete_course, get_device, delete_device, get_device_manage, get_file, delete_file
 
 from config import settings
@@ -19,7 +19,7 @@ from django.http import HttpResponse
 
 # Course
 class CourseView(APIView, PaginationHandlerMixin):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+    # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -74,7 +74,7 @@ class CourseView(APIView, PaginationHandlerMixin):
 
 # Device
 class DeviceView(APIView, PaginationHandlerMixin):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+    # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -129,7 +129,7 @@ class DeviceView(APIView, PaginationHandlerMixin):
 
 
 class DeviceManageView(APIView, PaginationHandlerMixin):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+    # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -191,14 +191,14 @@ class DeviceManageView(APIView, PaginationHandlerMixin):
             return Response({'device_manage_id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-# File
-class FileManageView(APIView, PaginationHandlerMixin):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+# StudyDocument
+class StudyDocumentView(APIView, PaginationHandlerMixin):
+    # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
     parser_classes = (JSONParser, MultiPartParser, FileUploadParser)
 
     def get(self, request):
-        files = FileManage.objects.all()
+        files = StudyDocument.objects.all()
 
         # Get query param for id or sort
         id = request.query_params.get('id')
@@ -209,16 +209,16 @@ class FileManageView(APIView, PaginationHandlerMixin):
         if sort:
             files = files.order_by(f'{sort}')
 
-        serializer = FileManageSerializer(files, many=True)
+        serializer = StudyDocumentSerializer(files, many=True)
 
         page = self.paginate_queryset(files)
         if page:
-            serializer = self.get_paginated_response(FileManageSerializer(page, many=True).data)
+            serializer = self.get_paginated_response(StudyDocumentSerializer(page, many=True).data)
 
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = FileManageSerializer(data=request.data)
+        serializer = StudyDocumentSerializer(data=request.data)
         try:
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -230,7 +230,7 @@ class FileManageView(APIView, PaginationHandlerMixin):
         id = request.query_params.get('id')
         if id:
             file = get_file(id)
-            serializer = FileManageSerializer(file, data=request.data, partial=True)
+            serializer = StudyDocumentSerializer(file, data=request.data, partial=True)
             try:
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
@@ -251,7 +251,7 @@ class FileManageView(APIView, PaginationHandlerMixin):
 
 
 @api_view(['GET', ])
-@permission_classes([IsAuthenticated, IsAdminUser, ])
+# @permission_classes([IsAuthenticated, IsAdminUser, ])
 def download(request, pk):
     f = get_file(pk)
     filepath = os.path.join(settings.BASE_DIR, f.file.path)

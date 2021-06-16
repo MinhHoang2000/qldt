@@ -25,3 +25,13 @@ def update_teacher(teacher, teacher_data):
 
 def delete_teacher(pk):
     return get_teacher(pk).delete()
+
+
+def get_current_teacher(account):
+    if account is AnonymousUser:
+        return exceptions.NotAuthenticated("You need login")
+    try:
+        teacher = Teacher.objects.get(account=account)
+        return teacher
+    except Teacher.DoesNotExist:
+        return exceptions.NotFound("Not found teacher")

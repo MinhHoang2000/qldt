@@ -1,0 +1,103 @@
+
+# teacher
+{
+    "account": {
+        "username": "t1",
+        "password": "t12345678"
+    },
+
+    "person": {
+        "first_name": "Lung Linh",
+        "last_name": "Long Lanh",
+        "date_of_birth": "2000-05-02",
+        "address": "123etr",
+        "gender": "F"
+    }
+
+}
+
+# student
+
+{
+    "account": {
+        "username": "t2",
+        "password": "t12345678"
+    },
+
+    "person": {
+        "first_name": "Thinh buoi",
+        "last_name": "Son dut",
+        "date_of_birth": "2000-05-02",
+        "address": "123etr",
+        "gender": "M"
+    },
+
+    "classroom_id": "1",
+    "status": "DH",
+    "admission_year": "2020"
+
+}
+
+
+# course
+{
+    "course_name": "English",
+    "group_course": "So"
+
+}
+
+# conduct
+{
+    "score" : "T",
+    "term": 1,
+    "school_year": 2020,
+    "student_id": 1,
+}
+
+# classroom
+{
+    "class_name": "12A1",
+    "homeroom_teacher_id": "1",
+    "location": "304"
+
+}
+
+# timetable
+{
+    "teacher_id": 1,
+    "course_id": 1,
+    "day_of_week": "Mon",
+    "shifts": 1,
+    "semester": 1,
+    "school_year": 2020
+}
+
+# class record
+{
+    "teacher_id": 1,
+    "course_id": 1,
+    "day_of_week": "Mon",
+    "shifts": 1,
+    "semester": 1,
+    "school_year": 2020,
+    "study_week": 1,
+    "attendant": 0,
+    "note": "Vang vai lon"
+}
+
+
+# device
+{
+    "status": "N",
+    "device_name": "Sieu xe",
+    "amount": 12,
+    "price": 13244179
+}
+
+# device manage
+{
+    "day_of_week" : "Mon",
+    "shifts" : "1",
+    "week": "1",
+    "account_id": "36455447-f115-4c35-811a-6672b380fab6"
+}

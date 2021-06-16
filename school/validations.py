@@ -4,31 +4,38 @@ from .models import Timetable, ClassRecord, DeviceManage
 from teachers.utils import get_teacher
 
 
-def validate_teacher_timetable(teacher_id, day_of_week, shifts):
+def validate_teacher_timetable(teacher_id, day_of_week, shifts, semester, school_year):
     teacher = get_teacher(teacher_id)
     timetable = Timetable.objects.filter(teacher=teacher,
                                          day_of_week=day_of_week,
-                                         shifts=shifts)
+                                         shifts=shifts,
+                                         semester=semester,
+                                         school_year=school_year)
     if timetable.exists():
-        raise serializers.ValidationError(f'Teacher timetable conflicts at {day_of_week} | {shifts}')
+        raise serializers.ValidationError(f'Teacher timetable conflicts at {day_of_week} | shifts: {shifts} | semester: {semester} | school_year: {school_year}')
 
 
-def validate_classroom_timetable(classroom_id, day_of_week, shifts):
+def validate_classroom_timetable(classroom_id, day_of_week, shifts, semester, school_year):
     classroom = get_classroom(classroom_id)
     timetable = Timetable.objects.filter(classroom=classroom,
                                          day_of_week=day_of_week,
-                                         shifts=shifts)
+                                         shifts=shifts,
+                                         semester=semester,
+                                         school_year=school_year)
     if timetable.exists():
-        raise serializers.ValidationError(f'Classroom timetable conflicts at {day_of_week} | {shifts}')
+        raise serializers.ValidationError(f'Classroom timetable conflicts at {day_of_week} | shifts: {shifts} | semester: {semester} | school_year: {school_year}')
 
 
-def validate_classroom_record(classroom_id, day_of_week, shifts, study_week):
+def validate_classroom_record(classroom_id, day_of_week, shifts, study_week, semester, school_year):
     classroom = get_classroom(classroom_id)
     record = ClassRecord.objects.filter(classroom=classroom,
                                         day_of_week=day_of_week,
-                                        shifts=shifts, study_week=study_week)
+                                        shifts=shifts,
+                                        study_week=study_week,
+                                        semester=semester,
+                                        school_year=school_year)
     if record.exists():
-        raise serializers.ValidationError(f'Classroom record conflicts at Week: {study_week} | {day_of_week} | {shifts}')
+        raise serializers.ValidationError(f'Classroom record conflicts at {day_of_week} | shifts: {shifts} | semester: {semester} | school_year: {school_year}')
 
 
 def validate_classroom_attendant(classroom_id, attendant):

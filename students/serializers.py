@@ -3,7 +3,7 @@ from accounts.serializers import AccountSerializer
 from persons.serializers import PersonSerializer, AchievementSerializer, HealthSerializer
 from school.serializers import ClassroomSerializer, CourseSerializer
 
-from .models import Student, Grade, Parent
+from .models import Student, Grade, Parent, Conduct
 from school.models import Classroom, Course
 
 from persons.utils import create_person, update_person, create_health, update_health, assign_health
@@ -33,6 +33,12 @@ class GradeSerializer(serializers.ModelSerializer):
         course = get_course(validated_data.pop('course_id'))
         return Grade.objects.create(course=course, student_id=student_id, **validated_data)
 
+
+class ConductSerializer(serializers.ModelSerializer):
+    student_id = serializers.IntegerField()
+    class Meta:
+        model = Conduct
+        fields = ['id', 'score', 'term', 'school_year', 'student_id']
 
 class StudentSerializer(serializers.ModelSerializer):
     account = AccountSerializer()

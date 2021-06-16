@@ -1,4 +1,4 @@
-from .models import Student, Parent, Grade
+from .models import Student, Parent, Grade, Conduct
 from rest_framework import exceptions
 
 
@@ -35,3 +35,12 @@ def get_grade(pk):
 
 def delete_grade(pk):
     return get_grade(pk).delete()
+
+def get_conduct(pk):
+    try:
+        return Conduct.objects.get(pk=pk)
+    except Conduct.DoesNotExist:
+        raise exceptions.NotFound('Conduct does not exist')
+
+def delete_conduct(pk):
+    return get_conduct(pk).delete()

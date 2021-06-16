@@ -12,7 +12,7 @@ from school.utils import get_classroom, get_timetable, get_record, delete_timeta
 
 # Classroom
 class ClassroomView(APIView, PaginationHandlerMixin):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+    # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -69,7 +69,7 @@ class ClassroomView(APIView, PaginationHandlerMixin):
 
 # Timetable
 class ClassTimetableView(APIView, PaginationHandlerMixin):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+    # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -80,8 +80,18 @@ class ClassTimetableView(APIView, PaginationHandlerMixin):
 
             # Sort
             sort = request.query_params.get('sort_by')
+            semester = request.query_params.get('semester')
+            school_year = request.query_params.get('school_year')
+
+            if semester:
+                timetables = timetables.filter(semester=semester)
+
+            if school_year:
+                timetables = timetables.filter(school_year=school_year)
+
             if sort:
                 timetables = timetables.order_by(f'{sort}')
+
 
             # Get by id
             time_id = request.query_params.get('time_id')
@@ -141,7 +151,7 @@ class ClassTimetableView(APIView, PaginationHandlerMixin):
 
 # Record
 class ClassRecordView(APIView, PaginationHandlerMixin):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+    # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -151,11 +161,20 @@ class ClassRecordView(APIView, PaginationHandlerMixin):
             records = classroom.classrecords.all()
             # query_set
             study_week = request.query_params.get('study_week')
+            semester = request.query_params.get('semester')
+            school_year = request.query_params.get('school_year')
+
             record_id = request.query_params.get('record_id')
             sort = request.query_params.get('sort_by')
 
             if study_week:
                 records = records.filter(study_week=study_week)
+
+            if semester:
+                records = records.filter(semester=semester)
+
+            if school_year:
+                records = records.filter(school_year=school_year)
 
             if record_id:
                 records = records.filter(id=record_id)

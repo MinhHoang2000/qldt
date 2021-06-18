@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import Teacher
 from school.models import Classroom
 from accounts.serializers import AccountSerializer
-from persons.serializers import PersonSerializer, AchievementSerializer
+from persons.serializers import PersonSerializer, AchievementSerializer, HealthSerializer
 from persons.utils import create_person, update_person
 from accounts.utils import create_account, update_account
 

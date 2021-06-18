@@ -8,6 +8,9 @@ from teachers.models import Teacher
 from teachers.serializers import TeacherSerializer
 from teachers.utils import get_teacher, delete_teacher
 
+from config.settings import REST_FRAMEWORK
+
+ORDERING_PARAM = REST_FRAMEWORK['ORDERING_PARAM']
 
 class TeacherView(APIView, PaginationHandlerMixin):
     # permission_classes = (IsAdminUser, IsAuthenticated)
@@ -18,7 +21,7 @@ class TeacherView(APIView, PaginationHandlerMixin):
 
         # Get query param for id or sort
         id = request.query_params.get('id')
-        sort = request.query_params.get('sort_by')
+        sort = request.query_params.get(ORDERING_PARAM)
 
         if id:
             teachers = teachers.filter(id=id)

@@ -8,6 +8,9 @@ from school.models import Classroom
 from school.serializers import ClassroomSerializer, TimetableSerializer, RecordSerializer
 from school.utils import get_classroom, get_timetable, get_record, delete_timetable, delete_record
 
+from config.settings import REST_FRAMEWORK
+
+ORDERING_PARAM = REST_FRAMEWORK['ORDERING_PARAM']
 
 
 # Classroom
@@ -20,7 +23,7 @@ class ClassroomView(APIView, PaginationHandlerMixin):
 
         # Query param for id or sort
         id = request.query_params.get('id')
-        sort = request.query_params.get('sort_by')
+        sort = request.query_params.get(ORDERING_PARAM)
         if id:
             classrooms = classrooms.filter(id=id)
         if sort:
@@ -79,7 +82,7 @@ class ClassTimetableView(APIView, PaginationHandlerMixin):
             timetables = classroom.timetables.all()
 
             # Sort
-            sort = request.query_params.get('sort_by')
+            sort = request.query_params.get(ORDERING_PARAM)
             semester = request.query_params.get('semester')
             school_year = request.query_params.get('school_year')
 
@@ -165,7 +168,7 @@ class ClassRecordView(APIView, PaginationHandlerMixin):
             school_year = request.query_params.get('school_year')
 
             record_id = request.query_params.get('record_id')
-            sort = request.query_params.get('sort_by')
+            sort = request.query_params.get(ORDERING_PARAM)
 
             if study_week:
                 records = records.filter(study_week=study_week)

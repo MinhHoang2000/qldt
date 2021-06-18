@@ -8,6 +8,9 @@ from students.models import Student, Parent, Grade, Conduct
 from students.serializers import StudentSerializer, ParentSerializer, GradeSerializer, ConductSerializer
 from students.utils import get_student, get_parent, get_grade, get_conduct, delete_student, delete_grade, delete_parent
 
+from config.settings import REST_FRAMEWORK
+
+ORDERING_PARAM = REST_FRAMEWORK['ORDERING_PARAM']
 
 # Student
 class StudentView(APIView, PaginationHandlerMixin):
@@ -21,7 +24,7 @@ class StudentView(APIView, PaginationHandlerMixin):
         id = request.query_params.get('id')
         status = request.query_params.get('status')
         admission_year = request.query_params.get('admission_year')
-        sort = request.query_params.get('sort_by')
+        sort = request.query_params.get(ORDERING_PARAM)
 
         if id:
             students = students.filter(id=id)
@@ -75,7 +78,7 @@ class StudentView(APIView, PaginationHandlerMixin):
 
 
 class StudentGradeView(APIView, PaginationHandlerMixin):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+    # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -86,7 +89,7 @@ class StudentGradeView(APIView, PaginationHandlerMixin):
             # query_set
             term = request.query_params.get('term')
             school_year = request.query_params.get('school_year')
-            sort = request.query_params.get('sort_by')
+            sort = request.query_params.get(ORDERING_PARAM)
 
             if term:
                 grades = grades.filter(term=term)
@@ -152,7 +155,7 @@ class StudentConductView(APIView, PaginationHandlerMixin):
         # query_set
         term = request.query_params.get('term')
         school_year = request.query_params.get('school_year')
-        sort = request.query_params.get('sort_by')
+        sort = request.query_params.get(ORDERING_PARAM)
 
         if term:
             conducts = conducts.filter(term=term)
@@ -205,13 +208,13 @@ class StudentConductView(APIView, PaginationHandlerMixin):
 
 # Parent
 class ParentView(APIView, PaginationHandlerMixin):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+    # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
         parents = Parent.objects.all()
         id = request.query_params.get('id')
-        sort = request.query_params.get('sort_by')
+        sort = request.query_params.get(ORDERING_PARAM)
         if id:
             parents = parents.filter(id=id)
         if sort:

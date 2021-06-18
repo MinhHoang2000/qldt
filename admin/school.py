@@ -7,15 +7,18 @@ from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
 from rest_framework.response import Response
 from config.pagination import Pagination, PaginationHandlerMixin
 
-from school.models import Course, Device, StudyDocument
-from school.serializers import CourseSerializer, DeviceSerializer, DeviceManageSerializer, StudyDocumentSerializer
-from school.utils import get_course, delete_course, get_device, delete_device, get_device_manage, get_file, delete_file
+from school.models import Course, Device, StudyDocument, TeachingInfo
+from school.serializers import CourseSerializer, DeviceSerializer, DeviceManageSerializer, StudyDocumentSerializer, TeachingInfoSerializer
+from school.utils import get_course, delete_course, get_device, delete_device, get_device_manage, get_file, delete_file, get_teaching_info, delete_teaching_info
 
 from config import settings
 import os
 import mimetypes
 from django.http import HttpResponse
 
+from config.settings import REST_FRAMEWORK
+
+ORDERING_PARAM = REST_FRAMEWORK['ORDERING_PARAM']
 
 # Course
 class CourseView(APIView, PaginationHandlerMixin):
@@ -27,7 +30,7 @@ class CourseView(APIView, PaginationHandlerMixin):
 
         # Get query params for sort or id
         id = request.query_params.get('id')
-        sort = request.query_params.get('sort_by')
+        sort = request.query_params.get(ORDERING_PARAM)
 
         if id:
             courses = courses.filter(id=id)
@@ -41,13 +44,13 @@ class CourseView(APIView, PaginationHandlerMixin):
         return Response(serializer.data)
 
     def post(self, request):
-        course = CourseSerializer(data=request.data)
+        serializer = CourseSerializer(data=request.data)
         try:
-            course.is_valid(raise_exception=True)
-            course.save()
-            return Response(course.data, status=status.HTTP_201_CREATED)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         except serializers.ValidationError:
-            return Response(course.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request):
         id = request.query_params.get('id')
@@ -71,6 +74,59 @@ class CourseView(APIView, PaginationHandlerMixin):
         else:
             return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
 
+class TeachingInfoView(APIView, PaginationHandlerMixin):
+    # permission_classes = (IsAdminUser, IsAuthenticated)
+    pagination_class = Pagination
+
+    def get(self, request):
+        teaching_info = TeachingInfo.objects.all()
+
+        # Get query params for sort or id
+        id = request.query_params.get('id')
+        sort = request.query_params.get(ORDERING_PARAM)
+
+        if id:
+            teaching_info = teaching_info.filter(id=id)
+        if sort:
+            teaching_info = teaching_info.order_by(f'{sort}')
+
+        serializer = TeachingInfoSerializer(teaching_info, many=True)
+        page = self.paginate_queryset(teaching_info)
+        if page:
+            serializer = self.get_paginated_response(TeachingInfoSerializer(page, many=True).data)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = TeachingInfoSerializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except serializers.ValidationError:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request):
+        id = request.query_params.get('id')
+        if id:
+            teaching_info = get_teaching_info(id)
+            serializer = TeachingInfoSerializer(teaching_info, data=request.data, partial=True)
+            try:
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return Response(serializer.data)
+            except serializers.ValidationError:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request):
+        id = request.query_params.get('id')
+        if id:
+            delete_teaching_info(id)
+            return Response('Delete successful')
+        else:
+            return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 # Device
 class DeviceView(APIView, PaginationHandlerMixin):
@@ -82,7 +138,7 @@ class DeviceView(APIView, PaginationHandlerMixin):
 
         # Get query param for id or sort
         id = request.query_params.get('id')
-        sort = request.query_params.get('sort_by')
+        sort = request.query_params.get(ORDERING_PARAM)
         if id:
             devices = devices.filter(id=id)
         if sort:
@@ -139,7 +195,7 @@ class DeviceManageView(APIView, PaginationHandlerMixin):
             device_manages = device.device_manages.all()
 
             # Get query param for sort
-            sort = request.query_params.get('sort_by')
+            sort = request.query_params.get(ORDERING_PARAM)
             if sort:
                 device_manages = device_manages.order_by(f'{sort}')
 
@@ -202,12 +258,19 @@ class StudyDocumentView(APIView, PaginationHandlerMixin):
 
         # Get query param for id or sort
         id = request.query_params.get('id')
-        sort = request.query_params.get('sort_by')
+        sort = request.query_params.get(ORDERING_PARAM)
+        course_id = request.query_params.get('course_id')
+        teacher_id = request.query_params.get('teacher_id')
 
         if id:
             files = files.filter(id=id)
+        if course_id:
+            files = files.filter(course_id=course_id)
+        if teacher_id:
+            files = files.filter(teacher_id=teacher_id)
         if sort:
             files = files.order_by(f'{sort}')
+
 
         serializer = StudyDocumentSerializer(files, many=True)
 

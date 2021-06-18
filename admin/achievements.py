@@ -17,8 +17,12 @@ from students.utils import get_student
 from teachers.utils import get_teacher
 
 
+from config.settings import REST_FRAMEWORK
+
+ORDERING_PARAM = REST_FRAMEWORK['ORDERING_PARAM']
+
 class AchievementView(APIView, PaginationHandlerMixin):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+    # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -26,7 +30,7 @@ class AchievementView(APIView, PaginationHandlerMixin):
 
         # queryset
         id = request.query_params.get('id')
-        sort = request.query_params.get('sort_by')
+        sort = request.query_params.get(ORDERING_PARAM)
         if id:
             achievements = achievements.filter(id=id)
         if sort:
@@ -73,13 +77,13 @@ class AchievementView(APIView, PaginationHandlerMixin):
 
 
 class StudentAchievementView(APIView, PaginationHandlerMixin):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+    # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
         id = request.query_params.get('student_id')
 
-        sort = request.query_params.get('sort_by')
+        sort = request.query_params.get(ORDERING_PARAM)
 
         if id:
             student = get_student(id)
@@ -117,7 +121,7 @@ class TeacherAchievementView(APIView, PaginationHandlerMixin):
 
     def get(self, request):
         id = request.query_params.get('teacher_id')
-        sort = request.query_params.get('sort_by')
+        sort = request.query_params.get(ORDERING_PARAM)
         if id:
             teacher = get_teacher(id)
             serializer = TeacherAchievementSerializer(teacher)

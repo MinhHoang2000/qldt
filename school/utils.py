@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework import exceptions
-from .models import Classroom, Course, Timetable, ClassRecord, Device, DeviceManage, StudyDocument
+from .models import Classroom, Course, Timetable, ClassRecord, Device, DeviceManage, StudyDocument, TeachingInfo
 import os
 
 
@@ -94,3 +94,12 @@ def delete_file(pk):
     except FileNotFoundError:
         raise serializers.ValidationError('File not found')
     return f.delete()
+
+def get_teaching_info(pk):
+    try:
+        return TeachingInfo.objects.get(pk=pk)
+    except TeachingInfo.DoesNotExist:
+        raise exceptions.NotFound('Info does not exist')
+
+def delete_teaching_info(pk):
+    return get_teaching_info(pk).delete()

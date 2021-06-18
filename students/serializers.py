@@ -19,7 +19,7 @@ class GradeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Grade
-        fields = ['id', 'course_id', 'school_year', 'term', 'quiz1', 'quiz2', 'quiz3', 'test', 'mid_term_test', 'final_test', 'start_update']
+        fields = ['id', 'course_id', 'school_year', 'semester', 'quiz1', 'quiz2', 'quiz3', 'test', 'mid_term_test', 'final_test', 'start_update', 'student_id']
 
     def validate_course_id(self, value):
         try:
@@ -38,7 +38,7 @@ class ConductSerializer(serializers.ModelSerializer):
     student_id = serializers.IntegerField()
     class Meta:
         model = Conduct
-        fields = ['id', 'score', 'term', 'school_year', 'student_id']
+        fields = ['id', 'score', 'semester', 'school_year', 'student_id']
 
 class StudentSerializer(serializers.ModelSerializer):
     account = AccountSerializer()

@@ -16,6 +16,7 @@
 
 }
 
+
 # student
 
 {
@@ -38,6 +39,30 @@
 
 }
 
+# health
+{
+    "health": {
+        "weight": 56,
+        "height": 170,
+        "eye_sight":10,
+        "health_status": "Good",
+        "disease": "None"
+    }
+}
+
+# parent
+{
+    "person": {
+        "first_name": "Sep Tong",
+        "last_name": "Thu Ki",
+        "date_of_birth": "1950-05-02",
+        "address": "123etr",
+        "gender": "F"
+    },
+    "student_id": [1],
+    "avacation": "Sep"
+
+}
 
 # course
 {
@@ -49,9 +74,9 @@
 # conduct
 {
     "score" : "T",
-    "term": 1,
+    "semester": 1,
     "school_year": 2020,
-    "student_id": 1,
+    "student_id": 1
 }
 
 # classroom
@@ -100,4 +125,22 @@
     "shifts" : "1",
     "week": "1",
     "account_id": "36455447-f115-4c35-811a-6672b380fab6"
+}
+
+# teaching_info
+{
+    "school_year": 2020,
+    "semester": 1,
+    "teacher_id": 1,
+    "classroom_id": 1,
+    "course_id": 1
+}
+
+# grade
+{
+    "course_id": 1,
+    "school_year": 2020,
+    "semester": 1,
+    "quiz1": 8.5
+
 }

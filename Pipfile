@@ -9,6 +9,7 @@ djangorestframework = "*"
 mysql-connector-python = "*"
 mysqlclient = "*"
 djangorestframework-simplejwt = "*"
+django-filter = "*"
 
 [dev-packages]
 

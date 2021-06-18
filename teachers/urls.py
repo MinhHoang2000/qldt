@@ -1,22 +1,20 @@
 # from os import name
 from django.urls import path
-# from .views import AllGradeStudent, ClassRecordCreate, ClassRecordDetail, ListClassRecord, ListGrade, ListStudent, ListStudyDocument, ListTeachingInfo, GradeDetail, TeacherTimetable, UploadStudyDocument
+from .views import TeachingInfoView, StudentView, StudentGradeView, ClassRecordView, StudyDocumentView, UploadStudyDocumentView, TimetableView, ClassTimetableView, StudentConductView
 
 urlpatterns = [
-#     path('me/teaching-info', ListTeachingInfo.as_view(), name='teaching_information'),
+    path('teaching_info', TeachingInfoView.as_view(), name='teaching_information'),
 
-#     path('list-student/class/<int:classroom_id>', ListStudent.as_view(), name='list_student_of_class'),
+    path('class/<int:class_id>/students', StudentView.as_view(), name='list_student_of_class'),
 
-#     path('list-student-grade/class/<int:classroom_id>', ListGrade.as_view(), name='list_student_grade_of_class'),
-#     path('grade/<int:grade_id>', GradeDetail.as_view(), name='grade_detail'),
-#     path('grade/student/<slug:student_id>', AllGradeStudent.as_view(), name='all_grade_of_student'),
+    path('class/<int:class_id>/grades',StudentGradeView.as_view(), name='list_student_grade_of_class'),
+    path('classes/timetable', ClassTimetableView.as_view()),
+    path('classes/conduct', StudentConductView.as_view()),
 
-#     path('list-classrecord', ListClassRecord.as_view(), name='list_classrecord'),
-#     path('classrecord/<int:classrecord_id>', ClassRecordDetail.as_view(), name='classrecord_detail'),
-#     path('classrecord/create', ClassRecordCreate.as_view(), name='create_classrecord'),
+    path('classes/<int:class_id>/records', ClassRecordView.as_view(), name='list_classrecord'),
 
-#     path('me/list-study-document',ListStudyDocument.as_view(), name='list_study_document'),
-#     path('me/upload', UploadStudyDocument.as_view(), name='upload_study_document'),
+    path('documents',StudyDocumentView.as_view(), name='list_study_document'),
+    path('upload', UploadStudyDocumentView.as_view(), name='upload_study_document'),
 
-#     path('me/timetable', TeacherTimetable.as_view(), name='teacher_timetable'),
+    path('timetable', TimetableView.as_view(), name='teacher_timetable'),
 ]

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Classroom, Course, Timetable, ClassRecord, Device, DeviceManage, StudyDocument
+from .models import Classroom, Course, Timetable, ClassRecord, Device, DeviceManage, StudyDocument, TeachingInfo
 from teachers.models import Teacher
 
 from teachers.serializers import TeacherSerializer
@@ -94,7 +94,7 @@ class RecordSerializer(serializers.ModelSerializer):
         except KeyError:
             pass
 
-        instance.attendant = attendant
+        instance.attendant = validated_data.get('attendant', instance.attendant)
         instance.note = validated_data.get('note', instance.note)
         instance.save()
         return instance
@@ -154,3 +154,13 @@ class StudyDocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudyDocument
         fields = ['id', 'name', 'file', 'study_week', 'teacher_id', 'course_id', 'classroom_id']
+        extra_kwargs = {'file': {'write_only': True}}
+
+
+class TeachingInfoSerializer(serializers.ModelSerializer):
+    teacher_id = serializers.IntegerField()
+    course_id = serializers.IntegerField()
+    classroom_id = serializers.IntegerField()
+    class Meta:
+        model = TeachingInfo
+        fields = ['id', 'school_year', 'semester', 'classroom_id', 'teacher_id', 'course_id']

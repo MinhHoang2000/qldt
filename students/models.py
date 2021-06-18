@@ -48,7 +48,7 @@ class Grade(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='grades')
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='grades')
     school_year = models.SmallIntegerField()
-    term = models.SmallIntegerField()
+    semester = models.SmallIntegerField()
     quiz1 = models.DecimalField(max_digits=3, decimal_places=2, null=True)
     quiz2 = models.DecimalField(max_digits=3, decimal_places=2, null=True)
     quiz3 = models.DecimalField(max_digits=3, decimal_places=2, null=True)
@@ -64,7 +64,7 @@ class Grade(models.Model):
 class Conduct(models.Model):
     id = models.AutoField(primary_key=True)
     score = models.CharField(max_length=2, choices=SCORES)
-    term = models.SmallIntegerField()
+    semester = models.SmallIntegerField()
     school_year = models.SmallIntegerField()
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='conduct')
 

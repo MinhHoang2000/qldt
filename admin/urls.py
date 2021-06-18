@@ -20,11 +20,12 @@ urlpatterns = [
 
     # teacher
     path('teachers', TeacherView.as_view()),
+    path('teaching_info', TeachingInfoView.as_view()),
 
     # classroom
-    path('classrooms', ClassroomView.as_view()),
-    path('classrooms/timetables', ClassTimetableView.as_view()),
-    path('classrooms/records', ClassRecordView.as_view()),
+    path('classes', ClassroomView.as_view()),
+    path('classes/timetables', ClassTimetableView.as_view()),
+    path('classes/records', ClassRecordView.as_view()),
 
     # course
     path('courses', CourseView.as_view()),

@@ -25,21 +25,6 @@ logger = logging.getLogger(__name__)
 
 
 # Account
-class RegisterView(APIView):
-    permission_classes = (IsAuthenticated, IsAdminUser)
-
-    def post(self, request):
-        account = create_account(request.data, is_admin=True)
-        return Response(status=status.HTTP_200_OK)
-
-
-class UpdateView(APIView):
-    permission_classes = (IsAdminUser, IsAuthenticated)
-
-    def put(self, request):
-        update_account(request.user, request.data)
-        return Response(status=status.HTTP_200_OK)
-
 
 class ListAccountView(APIView, PaginationHandlerMixin):
     permission_classes = (IsAdminUser, IsAuthenticated)

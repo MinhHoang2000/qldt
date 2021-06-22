@@ -50,6 +50,11 @@
     }
 }
 
+# achivements
+{
+    "achievement_name":"Thanh quay"
+}
+
 # parent
 {
     "person": {

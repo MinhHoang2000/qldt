@@ -41,8 +41,8 @@ class UpdateView(APIView):
         return Response(status=status.HTTP_200_OK)
 
 
-class AccountView(APIView, PaginationHandlerMixin):
-    # permission_classes = (IsAdminUser, IsAuthenticated)
+class ListAccountView(APIView, PaginationHandlerMixin):
+    permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -66,7 +66,17 @@ class AccountView(APIView, PaginationHandlerMixin):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def delete(self, request):
+
+class AccountView(APIView, PaginationHandlerMixin):
+    # permission_classes = (IsAdminUser, IsAuthenticated)
+    pagination_class = Pagination
+
+    def put(self, request, pk):
+        user = get_account(pk)
+        update_account(user, request.data)
+        return Response(status=status.HTTP_200_OK)
+
+    def delete(self, request, pk):
         id = request.query_params.get('id')
         if id:
             delete_account(id)

@@ -4,13 +4,14 @@ from school.utils import get_record, get_classroom, get_course, get_file as get_
 from students.utils import get_student, get_grade, get_conduct
 from teachers.utils import get_current_teacher
 from students.serializers import GradeSerializer, StudentSerializer, ConductSerializer
-from school.serializers import RecordSerializer, StudyDocumentSerializer, TeachingInfoSerializer, TimetableSerializer
+from school.serializers import RecordSerializer, StudyDocumentSerializer, TeachingInfoSerializer, TimetableSerializer, DeviceSerializer, DeviceManageSerializer
 from students.models import Grade, Student, Conduct
 from teachers.models import Teacher
-from school.models import ClassRecord, Classroom, Course, StudyDocument, TeachingInfo, Timetable
+from school.models import ClassRecord, Classroom, Course, StudyDocument, TeachingInfo, Timetable, Device, DeviceManage
 from .serializers import TeacherSerializer
 
 from accounts.permissions import IsTeacher
+from config.pagination import Pagination, PaginationHandlerMixin
 
 from rest_framework import exceptions, filters
 from rest_framework import serializers, status
@@ -28,6 +29,10 @@ from config import settings
 import os
 import mimetypes
 from django.http import HttpResponse
+
+from config.settings import REST_FRAMEWORK
+
+ORDERING_PARAM = REST_FRAMEWORK['ORDERING_PARAM']
 
 EXPIRED_DAYS = 30
 
@@ -385,5 +390,61 @@ class StudentConductView(APIView):
 
 
 
+class DeviceView(APIView, PaginationHandlerMixin):
+    permission_classes = [IsAuthenticated]
+    pagination_class = Pagination
 
+    def get(self, request):
+        user = request.user
+        try:
+            teacher = Teacher.objects.get(account=user)
+        except Exception:
+            raise serializers.ValidationError('Your account is don\'t have permissions to acess this information')
 
+        devices = Device.objects.all()
+
+        # Get query param for id or sort
+        id = request.query_params.get('id')
+        sort = request.query_params.get(ORDERING_PARAM)
+        if id:
+            devices = devices.filter(id=id)
+        if sort:
+            devices = devices.order_by(f'{sort}')
+
+        serializer = DeviceSerializer(devices, many=True)
+        page = self.paginate_queryset(devices)
+        if page:
+            serializer = self.get_paginated_response(DeviceSerializer(page, many=True).data)
+
+        return Response(serializer.data)
+
+class DeviceManageView(APIView, PaginationHandlerMixin):
+    permission_classes = [IsAuthenticated]
+    pagination_class = Pagination
+
+    def get(self, request):
+        user = request.user
+        try:
+            teacher = Teacher.objects.get(account=user)
+        except Exception:
+            raise serializers.ValidationError('Your account is don\'t have permissions to acess this information')
+
+        device_manages = DeviceManage.objects.filter(teacher=teacher)
+        serializer = DeviceManageSerializer(device_manages, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        user = request.user
+        try:
+            teacher = Teacher.objects.get(account=user)
+        except Exception:
+            raise serializers.ValidationError('Your account is don\'t have permissions to acess this information')
+
+        request.data.update({"teacher_id": teacher.id})
+        serializer = DeviceManageSerializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except serializers.ValidationError as error:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

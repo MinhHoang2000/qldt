@@ -126,7 +126,7 @@ class DeviceManage(models.Model):
     day_of_week = models.CharField(max_length=3, choices=DAY_OF_WEEK)
     shifts = models.SmallIntegerField()
     week = models.SmallIntegerField()
-    account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='devices')
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, related_name='devices')
 
     class Meta:
         db_table = 'device_manage'

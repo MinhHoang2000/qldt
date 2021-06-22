@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 # Account
 
 class ListAccountView(APIView, PaginationHandlerMixin):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+    # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
@@ -52,10 +52,11 @@ class ListAccountView(APIView, PaginationHandlerMixin):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class RegisterView(APIView):
-    permission_classes = (IsAuthenticated, IsAdminUser)
+    # permission_classes = (IsAuthenticated, IsAdminUser)
 
     def post(self, request):
-        account = create_account(request.data, is_admin=True)
+        is_admin = request.data.get('is_admin', "") == "true"
+        account = create_account(request.data, is_admin=is_admin)
         return Response(status=status.HTTP_200_OK)
 
 class AccountView(APIView, PaginationHandlerMixin):

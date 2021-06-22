@@ -7,6 +7,7 @@ from .serializers import *
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework.authtoken.models import Token
 
+
 class LoginView(APIView):
 
     def post(self, request):

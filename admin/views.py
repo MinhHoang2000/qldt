@@ -51,6 +51,12 @@ class ListAccountView(APIView, PaginationHandlerMixin):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+class RegisterView(APIView):
+    permission_classes = (IsAuthenticated, IsAdminUser)
+
+    def post(self, request):
+        account = create_account(request.data, is_admin=True)
+        return Response(status=status.HTTP_200_OK)
 
 class AccountView(APIView, PaginationHandlerMixin):
     # permission_classes = (IsAdminUser, IsAuthenticated)

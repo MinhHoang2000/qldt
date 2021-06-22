@@ -3,7 +3,6 @@ from .views import *
 
 urlpatterns = [
     # admin account
-    path('update', UpdateView.as_view()),
 
     # account
     path('account', ListAccountView.as_view()),

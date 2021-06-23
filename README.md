@@ -34,7 +34,7 @@
 
 ## Setup without docker
 1. Install pipenv
-2. pipenv install --system
+2. pipenv install
 3. Delete all the migrations files
 4. Delete .db folder
 5. Open mysql with username and password

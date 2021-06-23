@@ -35,7 +35,7 @@
 ## Setup without docker
 1. Install pipenv
 2. pipenv install
-3. Delete all the migrations files
+3. Delete all the migrations folders
 4. Delete .db folder
 5. Open mysql with username and password
 6. Go to settings.py in config folder, find DATABASES dict, type your username and password, port(default is 3306), host(use localhost), name(database name)

@@ -32,17 +32,17 @@
             docker-compose exec db mysql -u root -p qldt_db
             Enter password: 123456
 
-
-        To make new migrations:
-            1. delete all migraitons files in qldt
-            2. docker-compose exec backend python manage.py makemigrations account school students teachers persons
-            3. drop database qldt_db
-            4. create database qldt_db
-            5. use qldt_db;
-            6. docker-compose exec backend python manage.py migrate
-
-        Stop:
-            docker-commpose down
-
-
+## Setup without docker
+1. Install pipenv
+2. pipenv install --system
+3. Delete all the migrations files
+4. Delete .db folder
+5. Open mysql with username and password
+6. Go to settings.py in config folder, find DATABASES dict, type your username and password, port(default is 3306), host(use localhost), name(database name)
+7. Go to mysql(mysql -u <USERNAME> -p) create database with the name above(CREATE DATABASE <DATABASE_NAME>)
+8. pipenv shell
+9. python manage.py makemigrations accounts persons students teachers school
+10. python manage.py migrate
+11. python manage.py createsuperuser
+12. python manage.py runserver
 

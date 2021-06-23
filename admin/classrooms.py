@@ -4,7 +4,7 @@ from rest_framework import status, serializers
 from rest_framework.response import Response
 from config.pagination import Pagination, PaginationHandlerMixin
 
-from school.models import Classroom
+from school.models import Classroom, Timetable
 from school.serializers import ClassroomSerializer, TimetableSerializer, RecordSerializer
 from school.utils import get_classroom, get_timetable, get_record, delete_timetable, delete_record
 
@@ -71,45 +71,32 @@ class ClassroomView(APIView, PaginationHandlerMixin):
 
 
 # Timetable
-class ClassTimetableView(APIView, PaginationHandlerMixin):
+class TimetableView(APIView, PaginationHandlerMixin):
     # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     def get(self, request):
-        class_id = request.query_params.get('class_id')
-        if class_id:
-            classroom = get_classroom(class_id)
-            timetables = classroom.timetables.all()
+        timetables = Timetable.objects.all()
 
-            # Sort
-            sort = request.query_params.get(ORDERING_PARAM)
-            semester = request.query_params.get('semester')
-            school_year = request.query_params.get('school_year')
+        # Sort
+        sort = request.query_params.get(ORDERING_PARAM)
 
-            if semester:
-                timetables = timetables.filter(semester=semester)
+        # Get by id
+        time_id = request.query_params.get('time_id')
+        if time_id:
+            timetables = timetables.filter(id=time_id)
 
-            if school_year:
-                timetables = timetables.filter(school_year=school_year)
+        if sort:
+            classrooms = timetables.order_by(f'{sort}')
 
-            if sort:
-                timetables = timetables.order_by(f'{sort}')
+        serializer = TimetableSerializer(timetables, many=True)
+
+        page = self.paginate_queryset(timetables)
+        if page:
+            serializer = self.get_paginated_response(TimetableSerializer(page, many=True).data)
+        return Response(serializer.data)
 
 
-            # Get by id
-            time_id = request.query_params.get('time_id')
-            if time_id:
-                timetables = timetables.filter(id=time_id)
-
-            serializer = TimetableSerializer(timetables, many=True)
-
-            page = self.paginate_queryset(timetables)
-            if page:
-                serializer = self.get_paginated_response(TimetableSerializer(page, many=True).data)
-            return Response(serializer.data)
-
-        else:
-            return Response({'class_id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request):
         class_id = request.query_params.get('class_id')
@@ -150,6 +137,31 @@ class ClassTimetableView(APIView, PaginationHandlerMixin):
         else:
             return Response({'time_id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
 
+
+class SearchTimetableView(APIView, PaginationHandlerMixin):
+    # permission_classes = (IsAdminUser, IsAuthenticated)
+    pagination_class = Pagination
+    def get(self, request):
+        timetables = Timetable.objects.all()
+
+        # Sort
+        sort = request.query_params.get(ORDERING_PARAM)
+
+        # Get search value
+        teacher_name = request.data.get('teacher_name', '')
+        class_name = request.data.get('class_name', '')
+        course_name = request.data.get('course_name', '')
+
+        timetables.filter(teacher__person_first_name__contains=teacher_name,
+                          course__course_name__contains=course_name,
+                          classroom__class_name__contains=class_name)
+
+        serializer = TimetableSerializer(timetables, many=True)
+
+        page = self.paginate_queryset(timetables)
+        if page:
+            serializer = self.get_paginated_response(TimetableSerializer(page, many=True).data)
+        return Response(serializer.data)
 
 
 # Record

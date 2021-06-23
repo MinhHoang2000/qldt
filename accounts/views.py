@@ -45,13 +45,35 @@ class ProfileView(APIView):
 
     def get(self, request):
         if request.user.is_admin:
-            response = 'This account is admin'
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            return Response('This account is admin')
         elif request.user.student.exists():
             student = request.user.student.first()
             profile = StudentProfileSerializer(student)
-        else:
+        elif request.user.student.exists():
             teacher = request.user.teacher.first()
             profile = TeacherProfileSerializer(teacher)
+        else:
+            return Response('This account doesn\'t have any info')
 
         return Response(profile.data)
+
+    def put(self, request):
+        user = request.user
+
+        if user.student.exists():
+            student = user.student.first()
+            serializer = StudentProfileSerializer(student, request.data, partial=True)
+        elif user.teacher.exists():
+            teacher = user.teacher.first()
+            serializer = TeacherProfileSerializer(teacher, request.data, partial=True)
+
+        try:
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except serializers.ValidationError:
+            return Response(student.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+

@@ -3,10 +3,11 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
+from .models import Permission
 from students.models import Student
 from teachers.models import Teacher
+from persons.utils import update_person
 from persons.serializers import PersonSerializer
-from .models import Permission
 user = get_user_model()
 
 
@@ -64,7 +65,15 @@ class AuthAccountSerializer(serializers.ModelSerializer):
     def get_token(self, user):
         refresh = RefreshToken.for_user(user)
         refresh['username'] = user.username
-        refresh['is_admin'] = user.is_admin
+
+        if user.student.exists():
+            refresh['account_type'] = 'student'
+        elif user.teacher.exists():
+            refresh['account_type'] = 'teacher'
+        elif user.is_admin:
+            refresh['account_type'] = 'admin'
+        else:
+            refresh['account_type'] = 'none'
         return {
             'refresh': str(refresh),
             'access': str(refresh.access_token),
@@ -97,12 +106,31 @@ class StudentProfileSerializer(serializers.ModelSerializer):
         fields = ['id', 'person', 'account_type']
 
 
+    def update(self, instance, validated_data):
+        try:
+            update_person(instance.person, validated_data.pop('person'))
+        except KeyError:
+            pass
+
+        instance.save()
+        return instance
+
+
 class TeacherProfileSerializer(serializers.ModelSerializer):
     account_type = serializers.CharField(default='teacher')
     person = PersonSerializer()
     class Meta:
         model = Teacher
         fields = ['id', 'person', 'account_type']
+
+    def update(self, instance, validated_data):
+        try:
+            update_person(instance.person, validated_data.pop('person'))
+        except KeyError:
+            pass
+
+        instance.save()
+        return instance
 
 
 class PermissionSerializer(serializers.ModelSerializer):

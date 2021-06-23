@@ -151,6 +151,9 @@ class DeviceView(APIView, PaginationHandlerMixin):
 
         return Response(serializer.data)
 
+
+class DeviceAddView(APIView):
+    # permission_classes = (IsAdminUser, IsAuthenticated)
     def post(self, request):
         serializer = DeviceSerializer(data=request.data)
         try:
@@ -161,27 +164,21 @@ class DeviceView(APIView, PaginationHandlerMixin):
         except serializers.ValidationError:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def put(self, request):
-        id = request.query_params.get('id')
-        if id:
-            device = get_device(id)
-            serializer = DeviceSerializer(device, data=request.data, partial=True)
-            try:
-                serializer.is_valid(raise_exception=True)
-                serializer.save()
-                return Response(serializer.data)
-            except serializers.ValidationError:
-                return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
+class DeviceChangeDeleteView(APIView):
+    # permission_classes = (IsAdminUser, IsAuthenticated)
+    def put(self, request, pk):
+        device = get_device(pk)
+        serializer = DeviceSerializer(device, data=request.data, partial=True)
+        try:
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
+        except serializers.ValidationError:
+            return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request):
-        id = request.query_params.get('id')
-        if id:
-            delete_device(id)
-            return Response({'Delete successful'})
-        else:
-            return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
+    def delete(self, request, pk):
+        delete_device(id)
+        return Response({'Delete successful'})
 
 
 class DeviceManageView(APIView, PaginationHandlerMixin):

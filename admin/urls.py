@@ -27,7 +27,11 @@ urlpatterns = [
     path('classes/records', ClassRecordView.as_view()),
 
     path('timetable', TimetableView.as_view()),
+    path('timetable/new', TimetableCreateView.as_view()),
+    path('timetable/change/<int:pk>', TimetableChangeView.as_view()),
+    path('timetable/delete/<int:pk>', TimetableDeleteView.as_view()),
     path('timetable/search/details', SearchTimetableView.as_view()),
+    path('timetable/student/<int:pk>', TimetableStudentView.as_view()),
 
     # course
     path('courses', CourseView.as_view()),
@@ -38,7 +42,9 @@ urlpatterns = [
     path('achievements/teachers', TeacherAchievementView.as_view()),
 
     # device
-    path('devices', DeviceView.as_view()),
+    path('device', DeviceView.as_view()),
+    path('device/add', DeviceAddView.as_view()),
+    path('device/<int:pk>', DeviceChangeDeleteView.as_view()),
     path('device_manage', DeviceManageView.as_view()),
 
     # file

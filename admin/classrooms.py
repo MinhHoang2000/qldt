@@ -7,6 +7,7 @@ from config.pagination import Pagination, PaginationHandlerMixin
 from school.models import Classroom, Timetable
 from school.serializers import ClassroomSerializer, TimetableSerializer, RecordSerializer
 from school.utils import get_classroom, get_timetable, get_record, delete_timetable, delete_record
+from students.utils import get_student
 
 from config.settings import REST_FRAMEWORK
 
@@ -77,14 +78,8 @@ class TimetableView(APIView, PaginationHandlerMixin):
 
     def get(self, request):
         timetables = Timetable.objects.all()
-
         # Sort
         sort = request.query_params.get(ORDERING_PARAM)
-
-        # Get by id
-        time_id = request.query_params.get('time_id')
-        if time_id:
-            timetables = timetables.filter(id=time_id)
 
         if sort:
             classrooms = timetables.order_by(f'{sort}')
@@ -97,45 +92,49 @@ class TimetableView(APIView, PaginationHandlerMixin):
         return Response(serializer.data)
 
 
-
+class TimetableCreateView(APIView):
+    # permission_classes = (IsAdminUser, IsAuthenticated)
     def post(self, request):
-        class_id = request.query_params.get('class_id')
-        if class_id:
-            request.data.update({'classroom_id': class_id})
-            timetable = TimetableSerializer(data=request.data)
-            try:
-                timetable.is_valid(raise_exception=True)
-                timetable.save()
-                return Response(timetable.data, status=status.HTTP_201_CREATED)
-            except serializers.ValidationError as error:
-                return Response(error.detail, status=status.HTTP_400_BAD_REQUEST)
+        timetable = TimetableSerializer(data=request.data)
+        try:
+            timetable.is_valid(raise_exception=True)
+            timetable.save()
+            return Response(timetable.data, status=status.HTTP_201_CREATED)
+        except serializers.ValidationError as error:
+            return Response(error.detail, status=status.HTTP_400_BAD_REQUEST)
 
-        else:
-            return Response({'class_id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
+class TimetableChangeView(APIView):
+    # permission_classes = (IsAdminUser, IsAuthenticated)
+    def put(self, request, pk):
+        timetable = get_timetable(pk)
+        serializer = TimetableSerializer(timetable, data=request.data, partial=True)
+        try:
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
 
-    def put(self, request):
-        time_id = request.query_params.get('time_id')
-        if time_id:
-            timetable = get_timetable(time_id)
-            serializer = TimetableSerializer(timetable, data=request.data, partial=True)
-            try:
-                serializer.is_valid(raise_exception=True)
-                serializer.save()
-                return Response(serializer.data)
+        except serializers.ValidationError as error:
+            return Response(error.detail, status=status.HTTP_400_BAD_REQUEST)
 
-            except serializers.ValidationError as error:
-                return Response(error.detail, status=status.HTTP_400_BAD_REQUEST)
+class TimetableDeleteView(APIView):
+    # permission_classes = (IsAdminUser, IsAuthenticated)
+    def delete(self, request, pk):
+        delete_timetable(time_id)
+        return Response({'Delete successful'})
 
-        else:
-            return Response({'time_id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
+class TimetableStudentView(APIView, PaginationHandlerMixin):
+    # permission_classes = (IsAdminUser, IsAuthenticated)
+    pagination_class = Pagination
 
-    def delete(self, request):
-        time_id = request.query_params.get('time_id')
-        if time_id:
-            delete_timetable(time_id)
-            return Response({'Delete successful'})
-        else:
-            return Response({'time_id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
+    def get(self, request, pk):
+        student = get_student(pk)
+        timetable = Timetable.objects.filter(classroom=student.classroom)
+        serializer = TimetableSerializer(timetable, many=True)
+
+        page = self.paginate_queryset(timetable)
+        if page:
+            serializer = self.get_paginated_response(TimetableSerializer(page, many=True).data)
+        return Response(serializer.data)
 
 
 class SearchTimetableView(APIView, PaginationHandlerMixin):

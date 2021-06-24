@@ -20,6 +20,9 @@ from .achievements import *
 from .classrooms import *
 from .school import *
 
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -53,9 +56,16 @@ class ListAccountView(APIView, PaginationHandlerMixin):
 
 class RegisterView(APIView):
     # permission_classes = (IsAuthenticated, IsAdminUser)
+    @swagger_auto_schema(request_body=openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'username': openapi.Schema(type=openapi.TYPE_OBJECT, description='Username'),
+        'password': openapi.Schema(type=openapi.TYPE_OBJECT, description='Password'),
+        'is_admin': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='Is admin')
 
+    }))
     def post(self, request):
-        is_admin = request.data.get('is_admin', "") == "true"
+        is_admin = request.data.get('is_admin', False)
         account = create_account(request.data, is_admin=is_admin)
         return Response(status=status.HTTP_200_OK)
 

@@ -7,9 +7,18 @@ from .serializers import *
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework.authtoken.models import Token
 
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 class LoginView(APIView):
+    @swagger_auto_schema(request_body=openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'username': openapi.Schema(type=openapi.TYPE_OBJECT, description='Username'),
+        'password': openapi.Schema(type=openapi.TYPE_OBJECT, description='Password'),
 
+    }),
+    responses={200: AuthAccountSerializer,401: 'Unauthorization'})
     def post(self, request):
         credential = JSONParser().parse(request)
 

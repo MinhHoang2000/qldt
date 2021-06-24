@@ -13,9 +13,9 @@ from .schema import *
 
 class LoginView(APIView):
     @swagger_auto_schema(request_body=openapi.Schema(
-    type=openapi.TYPE_OBJECT,
-    properties=ACCOUNT_PROP,
-    required=['username', 'password']))
+        type=openapi.TYPE_OBJECT,
+        properties=ACCOUNT_PROP,
+        required=ACCOUNT_REQUIRED))
     def post(self, request):
         credential = JSONParser().parse(request)
 
@@ -33,8 +33,8 @@ class LoginView(APIView):
 class ChangePasswordView(APIView):
     permission_classes = (IsAuthenticated,)
     @swagger_auto_schema(request_body=openapi.Schema(
-    type=openapi.TYPE_OBJECT,
-    properties=CHANGE_PASS_PROP))
+        type=openapi.TYPE_OBJECT,
+        properties=CHANGE_PASS_PROP))
     def post(self, request):
         account = ChangePasswordSerializer(data=request.data, context={'request': request})
 

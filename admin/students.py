@@ -11,9 +11,7 @@ from students.utils import get_student, get_parent, get_grade, get_conduct, dele
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-from accounts.schema import ACCOUNT_PROP
-from persons.schema import PERSON_PROP, PERSON_REQUIRED, HEALTH_PROP
-from students.schema import GRADE_PROP, GRADE_REQUIRED, CONDUCT_PROP, CONDUCT_REQUIRED
+from students.schema import STUDENT_PROP, STUDENT_REQUIRED, GRADE_PROP, GRADE_REQUIRED, CONDUCT_PROP, CONDUCT_REQUIRED, PARENT_PROP, PARENT_REQUIRED
 from config.settings import REST_FRAMEWORK
 
 ORDERING_PARAM = REST_FRAMEWORK['ORDERING_PARAM']
@@ -51,18 +49,8 @@ class StudentView(APIView, PaginationHandlerMixin):
 
     @swagger_auto_schema(request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
-        properties={
-            'account': openapi.Schema(type=openapi.TYPE_OBJECT, properties=ACCOUNT_PROP, description='Account'),
-            'person': openapi.Schema(type=openapi.TYPE_OBJECT,
-                                     properties=PERSON_PROP,
-                                     required=PERSON_REQUIRED,
-                                     description='Personal Info'),
-            'classroom_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Classroom id'),
-            'status': openapi.Schema(type=openapi.TYPE_STRING, description='DH(Dang hoc) or DT(Dinh tri hoc) or TH(Thoi hoc)'),
-            'admission_year': openapi.Schema(type=openapi.TYPE_INTEGER, description='Admission year'),
-            'health':  openapi.Schema(type=openapi.TYPE_OBJECT, properties=HEALTH_PROP, description='Health condition'),
-            },
-        required=['account', 'classroom_id', 'person', 'status', 'admission_year']
+        properties=STUDENT_PROP,
+        required=STUDENT_REQUIRED
     ))
     def post(self, request):
         student = StudentSerializer(data=request.data)
@@ -256,6 +244,13 @@ class ParentView(APIView, PaginationHandlerMixin):
 
         return Response(serializer.data)
 
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties=PARENT_PROP,
+        required=PARENT_REQUIRED,
+        ),
+    )
     def post(self, request):
         parent = ParentSerializer(data=request.data)
         try:

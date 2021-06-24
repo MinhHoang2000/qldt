@@ -8,6 +8,10 @@ from teachers.models import Teacher
 from teachers.serializers import TeacherSerializer
 from teachers.utils import get_teacher, delete_teacher
 
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+from teachers.schema import TEACHER_PROP, TEACHER_REQUIRED
+
 from config.settings import REST_FRAMEWORK
 
 ORDERING_PARAM = REST_FRAMEWORK['ORDERING_PARAM']
@@ -36,6 +40,12 @@ class TeacherView(APIView, PaginationHandlerMixin):
 
         return Response(serializer.data)
 
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties=TEACHER_PROP,
+            required=TEACHER_REQUIRED,
+        ))
     def post(self, request):
         teacher = TeacherSerializer(data=request.data)
         try:

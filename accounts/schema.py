@@ -6,6 +6,8 @@ ACCOUNT_PROP = {
     'email': openapi.Schema(type=openapi.TYPE_STRING, description='Email'),
 }
 
+ACCOUNT_REQUIRED = ['username', 'password']
+
 CHANGE_PASS_PROP = {
     'current_password': openapi.Schema(type=openapi.TYPE_STRING, description='Old password'),
     'new_password': openapi.Schema(type=openapi.TYPE_STRING, description='New password'),

@@ -8,15 +8,21 @@ from students.models import Student, Parent, Grade, Conduct
 from students.serializers import StudentSerializer, ParentSerializer, GradeSerializer, ConductSerializer
 from students.utils import get_student, get_parent, get_grade, get_conduct, delete_student, delete_grade, delete_parent
 
+
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+from accounts.schema import ACCOUNT_PROP
+from persons.schema import PERSON_PROP, PERSON_REQUIRED, HEALTH_PROP
+from students.schema import GRADE_PROP, GRADE_REQUIRED, CONDUCT_PROP, CONDUCT_REQUIRED
 from config.settings import REST_FRAMEWORK
 
 ORDERING_PARAM = REST_FRAMEWORK['ORDERING_PARAM']
+
 
 # Student
 class StudentView(APIView, PaginationHandlerMixin):
     # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
-
     def get(self, request):
         students = Student.objects.all()
 
@@ -43,6 +49,21 @@ class StudentView(APIView, PaginationHandlerMixin):
             serializer = self.get_paginated_response(StudentSerializer(page, many=True).data)
         return Response(serializer.data)
 
+    @swagger_auto_schema(request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'account': openapi.Schema(type=openapi.TYPE_OBJECT, properties=ACCOUNT_PROP, description='Account'),
+            'person': openapi.Schema(type=openapi.TYPE_OBJECT,
+                                     properties=PERSON_PROP,
+                                     required=PERSON_REQUIRED,
+                                     description='Personal Info'),
+            'classroom_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Classroom id'),
+            'status': openapi.Schema(type=openapi.TYPE_STRING, description='DH(Dang hoc) or DT(Dinh tri hoc) or TH(Thoi hoc)'),
+            'admission_year': openapi.Schema(type=openapi.TYPE_INTEGER, description='Admission year'),
+            'health':  openapi.Schema(type=openapi.TYPE_OBJECT, properties=HEALTH_PROP, description='Health condition'),
+            },
+        required=['account', 'classroom_id', 'person', 'status', 'admission_year']
+    ))
     def post(self, request):
         student = StudentSerializer(data=request.data)
         try:
@@ -82,44 +103,45 @@ class StudentGradeView(APIView, PaginationHandlerMixin):
     pagination_class = Pagination
 
     def get(self, request):
-        student_id = request.query_params.get('student_id')
-        if student_id:
-            grades = Grade.objects.filter(student_id=student_id)
+        grades = Grade.objects.all()
 
-            # query_set
-            term = request.query_params.get('term')
-            school_year = request.query_params.get('school_year')
-            sort = request.query_params.get(ORDERING_PARAM)
+        # query_set
+        term = request.query_params.get('term')
+        school_year = request.query_params.get('school_year')
+        sort = request.query_params.get(ORDERING_PARAM)
 
-            if term:
-                grades = grades.filter(term=term)
-            if school_year:
-                grades = grades.filter(school_year=school_year)
-            if sort:
-                grades = grades.order_by(f'{sort}')
+        if term:
+            grades = grades.filter(term=term)
+        if school_year:
+            grades = grades.filter(school_year=school_year)
+        if sort:
+            grades = grades.order_by(f'{sort}')
 
-            serializer = GradeSerializer(grades, many=True)
+        serializer = GradeSerializer(grades, many=True)
 
-            # paginate
-            page = self.paginate_queryset(grades)
-            if page:
-                serializer = self.get_paginated_response(GradeSerializer(page, many=True).data)
-            return Response(serializer.data)
-        else:
-            return Response({'student id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
+        # paginate
+        page = self.paginate_queryset(grades)
+        if page:
+            serializer = self.get_paginated_response(GradeSerializer(page, many=True).data)
+        return Response(serializer.data)
 
+
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties=GRADE_PROP,
+        required=GRADE_REQUIRED,
+        ),
+    )
     def post(self, request):
-        student_id = request.query_params.get('student_id')
-        if student_id:
-            serializer = GradeSerializer(data=request.data, context={'student_id': student_id})
-            try:
-                serializer.is_valid(raise_exception=True)
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            except serializers.ValidationError:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({'student id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = GradeSerializer(data=request.data, context={'student_id': student_id})
+        try:
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except serializers.ValidationError:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
     def put(self, request):
         # Need id
@@ -172,6 +194,13 @@ class StudentConductView(APIView, PaginationHandlerMixin):
             serializer = self.get_paginated_response(ConductSerializer(page, many=True).data)
         return Response(serializer.data)
 
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties=CONDUCT_PROP,
+        required=CONDUCT_REQUIRED,
+        ),
+    )
     def post(self, request):
         serializer = ConductSerializer(data=request.data)
         try:

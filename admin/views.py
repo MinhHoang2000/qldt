@@ -19,6 +19,7 @@ from .teachers import *
 from .achievements import *
 from .classrooms import *
 from .school import *
+from .schema import *
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -56,14 +57,11 @@ class ListAccountView(APIView, PaginationHandlerMixin):
 
 class RegisterView(APIView):
     # permission_classes = (IsAuthenticated, IsAdminUser)
-    @swagger_auto_schema(request_body=openapi.Schema(
-    type=openapi.TYPE_OBJECT,
-    properties={
-        'username': openapi.Schema(type=openapi.TYPE_OBJECT, description='Username'),
-        'password': openapi.Schema(type=openapi.TYPE_OBJECT, description='Password'),
-        'is_admin': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='Is admin')
 
-    }))
+    @swagger_auto_schema(request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties=SIGNUP_ACCOUNT_PROP,
+        required = ['username', 'password', 'is_admin']))
     def post(self, request):
         is_admin = request.data.get('is_admin', False)
         account = create_account(request.data, is_admin=is_admin)
@@ -108,6 +106,9 @@ class PermissionView(APIView, PaginationHandlerMixin):
 
         return Response(serializer.data)
 
+    @swagger_auto_schema(request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties=PERMISSION_PROP))
     def post(self, request):
         serializer = PermissionSerializer(data=request.data)
         try:

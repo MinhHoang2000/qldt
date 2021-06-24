@@ -9,16 +9,13 @@ from rest_framework.authtoken.models import Token
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from .schema import *
 
 class LoginView(APIView):
     @swagger_auto_schema(request_body=openapi.Schema(
     type=openapi.TYPE_OBJECT,
-    properties={
-        'username': openapi.Schema(type=openapi.TYPE_OBJECT, description='Username'),
-        'password': openapi.Schema(type=openapi.TYPE_OBJECT, description='Password'),
-
-    }),
-    responses={200: AuthAccountSerializer,401: 'Unauthorization'})
+    properties=ACCOUNT_PROP,
+    required=['username', 'password']))
     def post(self, request):
         credential = JSONParser().parse(request)
 
@@ -35,7 +32,9 @@ class LoginView(APIView):
 
 class ChangePasswordView(APIView):
     permission_classes = (IsAuthenticated,)
-
+    @swagger_auto_schema(request_body=openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties=CHANGE_PASS_PROP))
     def post(self, request):
         account = ChangePasswordSerializer(data=request.data, context={'request': request})
 

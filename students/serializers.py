@@ -6,6 +6,7 @@ from school.serializers import ClassroomSerializer, CourseSerializer
 from .models import Student, Grade, Parent, Conduct
 from school.models import Classroom, Course
 
+from students.utils import get_student
 from persons.utils import create_person, update_person, create_health, update_health, assign_health
 from accounts.utils import create_account, update_account
 from school.utils import assign_classroom_by_id, get_classroom, get_course
@@ -29,9 +30,9 @@ class GradeSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Course does not exist')
 
     def create(self, validated_data):
-        student_id = self.context['student_id']
         course = get_course(validated_data.pop('course_id'))
-        return Grade.objects.create(course=course, student_id=student_id, **validated_data)
+        student = get_student(validated_data.pop('student_id'))
+        return Grade.objects.create(course=course, student=student, **validated_data)
 
 
 class ConductSerializer(serializers.ModelSerializer):

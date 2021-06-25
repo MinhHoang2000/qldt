@@ -52,6 +52,7 @@ class TimetableSerializer(serializers.ModelSerializer):
         try:
             teacher_id = validated_data.pop('teacher_id')
             validate_teacher_timetable(teacher_id, instance.day_of_week, instance.shifts)
+            instance.teacher_id = teacher_id
         except KeyError:
             pass
 

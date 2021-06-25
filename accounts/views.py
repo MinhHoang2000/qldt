@@ -10,6 +10,7 @@ from rest_framework.authtoken.models import Token
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from .schema import *
+from persons.schema import PERSON_PROP
 
 class LoginView(APIView):
     @swagger_auto_schema(request_body=openapi.Schema(
@@ -65,6 +66,14 @@ class ProfileView(APIView):
 
         return Response(profile.data)
 
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'person': openapi.Schema(type=openapi.TYPE_OBJECT, properties=PERSON_PROP, description='Personal Info'),
+            }
+        )
+    )
     def put(self, request):
         user = request.user
 

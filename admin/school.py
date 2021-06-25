@@ -60,6 +60,11 @@ class CourseView(APIView, PaginationHandlerMixin):
         except serializers.ValidationError:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Course id')],
+        request_body=openapi.Schema(type=openapi.TYPE_OBJECT,
+                                    properties=COURSE_PROP)
+    )
     def put(self, request):
         id = request.query_params.get('id')
         if id:
@@ -74,6 +79,9 @@ class CourseView(APIView, PaginationHandlerMixin):
         else:
             return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Course id')],
+    )
     def delete(self, request):
         id = request.query_params.get('id')
         if id:
@@ -126,6 +134,10 @@ class DeviceAddView(APIView):
 
 class DeviceChangeDeleteView(APIView):
     # permission_classes = (IsAdminUser, IsAuthenticated)
+
+    @swagger_auto_schema(request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties=DEVICE_PROP))
     def put(self, request, pk):
         device = get_device(pk)
         serializer = DeviceSerializer(device, data=request.data, partial=True)
@@ -184,9 +196,14 @@ class DeviceManageView(APIView, PaginationHandlerMixin):
         except serializers.ValidationError as error:
             return Response(error.detail, status=status.HTTP_400_BAD_REQUEST)
 
-
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Device manage id')],
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties=DEVICE_MANAGE_PROP)
+    )
     def put(self, request):
-        device_manage_id = request.query_params.get('device_manage_id')
+        device_manage_id = request.query_params.get('id')
         if device_manage_id:
             device_manage = get_device_manage(device_manage_id)
             serializer = DeviceManageSerializer(device_manage, data=request.data, partial=True)
@@ -197,17 +214,18 @@ class DeviceManageView(APIView, PaginationHandlerMixin):
             except serializers.ValidationError as error:
                 return Response(error.detail, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response({'device_manage_id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Device manage id')],
+    )
     def delete(self, request):
-        device_manage_id = request.query_params.get('device_manage_id')
+        device_manage_id = request.query_params.get('id')
         if device_manage_id:
             delete_device_manage(device_manage_id)
             return Response({'Delete successful'})
         else:
             return Response({'device_manage_id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
-
-
 
 
 # StudyDocument
@@ -260,6 +278,14 @@ class StudyDocumentView(APIView, PaginationHandlerMixin):
         except serializers.ValidationError:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='File id')],
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties=STUDY_DOC_PROP
+        )
+    )
     def put(self, request):
         id = request.query_params.get('id')
         if id:
@@ -275,6 +301,9 @@ class StudyDocumentView(APIView, PaginationHandlerMixin):
         else:
             return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='File id')],
+    )
     def delete(self, request):
         id = request.query_params.get('id')
         if id:

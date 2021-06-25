@@ -55,6 +55,13 @@ class TeacherView(APIView, PaginationHandlerMixin):
         except serializers.ValidationError:
             return Response(teacher.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Teacher id')],
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties=TEACHER_PROP,
+        ))
     def put(self, request):
         id = request.query_params.get('id')
         if id:
@@ -70,6 +77,10 @@ class TeacherView(APIView, PaginationHandlerMixin):
         else:
             return Response({'id query param need to be provide'})
 
+
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Teacher id')],
+    )
     def delete(self, request):
         id = request.query_params.get('id')
         if id:

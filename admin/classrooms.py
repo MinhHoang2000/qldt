@@ -9,6 +9,11 @@ from school.serializers import ClassroomSerializer, TimetableSerializer, RecordS
 from school.utils import get_classroom, get_timetable, get_record, delete_timetable, delete_record
 from students.utils import get_student
 
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
+from school.schema import CLASSROOM_PROP, CLASSROOM_REQUIRED, TIMETABLE_REQURIED, TIMETABLE_PROP, TIMETABLE_CHANGE_PROP,CLASSRECORD_PROP, CLASSRECORD_REQUIRED, CLASSRECORD_CHANGE_PROP
+
 from config.settings import REST_FRAMEWORK
 
 ORDERING_PARAM = REST_FRAMEWORK['ORDERING_PARAM']
@@ -38,6 +43,11 @@ class ClassroomView(APIView, PaginationHandlerMixin):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+    @swagger_auto_schema(request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties=CLASSROOM_PROP,
+        required=CLASSROOM_REQUIRED))
     def post(self, request):
         classroom = ClassroomSerializer(data=request.data)
         try:
@@ -48,6 +58,13 @@ class ClassroomView(APIView, PaginationHandlerMixin):
         except serializers.ValidationError:
             return Response(classroom.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('id', openapi.IN_QUERY, description="Classroom id", type=openapi.TYPE_INTEGER)],
+        request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties=CLASSROOM_PROP))
     def put(self, request):
         id = request.query_params.get('id')
         if id:
@@ -62,6 +79,10 @@ class ClassroomView(APIView, PaginationHandlerMixin):
         else:
             return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('id', openapi.IN_QUERY, description="Classroom id", type=openapi.TYPE_INTEGER)],
+    )
     def delete(self, request):
         id = request.query_params.get('id')
         if id:
@@ -94,6 +115,11 @@ class TimetableView(APIView, PaginationHandlerMixin):
 
 class TimetableCreateView(APIView):
     # permission_classes = (IsAdminUser, IsAuthenticated)
+
+    @swagger_auto_schema(request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties=TIMETABLE_PROP,
+        required=TIMETABLE_REQURIED))
     def post(self, request):
         timetable = TimetableSerializer(data=request.data)
         try:
@@ -105,6 +131,10 @@ class TimetableCreateView(APIView):
 
 class TimetableChangeView(APIView):
     # permission_classes = (IsAdminUser, IsAuthenticated)
+
+    @swagger_auto_schema(request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties=TIMETABLE_CHANGE_PROP))
     def put(self, request, pk):
         timetable = get_timetable(pk)
         serializer = TimetableSerializer(timetable, data=request.data, partial=True)
@@ -169,61 +199,64 @@ class ClassRecordView(APIView, PaginationHandlerMixin):
     pagination_class = Pagination
 
     def get(self, request):
+
+        records = classroom.classrecords.all()
+        # query_set
         class_id = request.query_params.get('class_id')
-        if class_id:
-            classroom = get_classroom(class_id)
-            records = classroom.classrecords.all()
-            # query_set
-            study_week = request.query_params.get('study_week')
-            semester = request.query_params.get('semester')
-            school_year = request.query_params.get('school_year')
+        study_week = request.query_params.get('study_week')
+        semester = request.query_params.get('semester')
+        school_year = request.query_params.get('school_year')
 
-            record_id = request.query_params.get('record_id')
-            sort = request.query_params.get(ORDERING_PARAM)
-
-            if study_week:
-                records = records.filter(study_week=study_week)
-
-            if semester:
-                records = records.filter(semester=semester)
-
-            if school_year:
-                records = records.filter(school_year=school_year)
-
-            if record_id:
-                records = records.filter(id=record_id)
-
-            if sort:
-                records = records.order_by(f'{sort}')
-
-            serializer = RecordSerializer(records, many=True)
-
-            # paginate
-            page = self.paginate_queryset(records)
-            if page:
-                serializer = self.get_paginated_response(RecordSerializer(page, many=True).data)
-
-            return Response(serializer.data)
-
-        else:
-            return Response({'class_id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
-
-    def post(self, request):
-        class_id = request.query_params.get('class_id')
-        if class_id:
-            request.data.update({'classroom_id': class_id})
-            serializer = RecordSerializer(data=request.data)
-            try:
-                serializer.is_valid(raise_exception=True)
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            except serializers.ValidationError as error:
-                return Response(error.detail, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({'class_id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
-
-    def put(self, request):
         record_id = request.query_params.get('record_id')
+        sort = request.query_params.get(ORDERING_PARAM)
+
+        if class_id :
+            records = records.filter(classroom_id=class_id)
+        if study_week:
+            records = records.filter(study_week=study_week)
+
+        if semester:
+            records = records.filter(semester=semester)
+
+        if school_year:
+            records = records.filter(school_year=school_year)
+
+        if record_id:
+            records = records.filter(id=record_id)
+
+        if sort:
+            records = records.order_by(f'{sort}')
+
+        serializer = RecordSerializer(records, many=True)
+
+        # paginate
+        page = self.paginate_queryset(records)
+        if page:
+            serializer = self.get_paginated_response(RecordSerializer(page, many=True).data)
+
+        return Response(serializer.data)
+
+
+    @swagger_auto_schema(request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties=CLASSRECORD_PROP,
+        required=CLASSRECORD_REQUIRED))
+    def post(self, request):
+        serializer = RecordSerializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except serializers.ValidationError as error:
+            return Response(error.detail, status=status.HTTP_400_BAD_REQUEST)
+
+    @swagger_auto_schema(
+        manual_parameters=[ openapi.Parameter('id', openapi.IN_QUERY, description="Class record id", type=openapi.TYPE_INTEGER)],
+        request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties=CLASSRECORD_CHANGE_PROP))
+    def put(self, request):
+        record_id = request.query_params.get('id')
         if record_id:
             record = get_record(record_id)
             serializer = RecordSerializer(record, data=request.data, partial=True)
@@ -235,12 +268,14 @@ class ClassRecordView(APIView, PaginationHandlerMixin):
             except serializers.ValidationError as error:
                 return Response(error.detail, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response({'record_id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(
+        manual_parameters=[ openapi.Parameter('id', openapi.IN_QUERY, description="Class record id", type=openapi.TYPE_INTEGER)],)
     def delete(self, request):
-        record_id = request.query_params.get('record')
+        record_id = request.query_params.get('id')
         if record_id:
             delete_record(record_id)
             return Response({'Delete successful'})
         else:
-            return Response({'record_id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)

@@ -7,6 +7,8 @@ SIGNUP_ACCOUNT_PROP = {
     'is_admin': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='Is admin')
 }
 
+SIGNUP_ACCOUNT_REQUIRED = ['username', 'password', 'is_admin']
+
 PERMISSION_PROP = {
     'permission_name': openapi.Schema(type=openapi.TYPE_STRING, description='Description permission'),
     'permission_code': openapi.Schema(type=openapi.TYPE_STRING, description='For checking permission'),

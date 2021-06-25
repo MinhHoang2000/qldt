@@ -59,6 +59,11 @@ class AchievementView(APIView, PaginationHandlerMixin):
         except serializers.ValidationError:
             return Response(achievement.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Achievement id')],
+        request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties=ACHIEVEMENT_PROP))
     def put(self, request):
         id = request.query_params.get('id')
         if id:
@@ -74,6 +79,9 @@ class AchievementView(APIView, PaginationHandlerMixin):
         else:
             return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Achievement id')],
+    )
     def delete(self, request):
         id = request.query_params.get('id')
         if id:

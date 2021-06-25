@@ -61,6 +61,13 @@ class StudentView(APIView, PaginationHandlerMixin):
         except serializers.ValidationError:
             return Response(student.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(
+        operation_description='Partial update',
+        manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Student id')],
+        request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties=STUDENT_PROP
+    ))
     def put(self, request):
         # Need id
         id = request.query_params.get('id')
@@ -77,6 +84,9 @@ class StudentView(APIView, PaginationHandlerMixin):
         else:
             return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Student id')],
+    )
     def delete(self, request):
         id = request.query_params.get('id')
         if id:
@@ -122,7 +132,7 @@ class StudentGradeView(APIView, PaginationHandlerMixin):
         ),
     )
     def post(self, request):
-        serializer = GradeSerializer(data=request.data, context={'student_id': student_id})
+        serializer = GradeSerializer(data=request.data)
         try:
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -130,10 +140,16 @@ class StudentGradeView(APIView, PaginationHandlerMixin):
         except serializers.ValidationError:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Grade id')],
+        request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties=GRADE_PROP,
+        ),
+    )
     def put(self, request):
         # Need id
-        grade_id = request.query_params.get('grade_id')
+        grade_id = request.query_params.get('id')
         if grade_id:
             grade = get_grade(grade_id)
             serializer = GradeSerializer(grade, data=request.data, partial=True)
@@ -144,16 +160,19 @@ class StudentGradeView(APIView, PaginationHandlerMixin):
             except serializers.ValidationError:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response('grade_id query param need to be provided', status=status.HTTP_400_BAD_REQUEST)
+            return Response('id query param need to be provided', status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Grade id')],
+    )
     def delete(self, request):
         # Need id
-        grade_id = request.query_params.get('grade_id')
+        grade_id = request.query_params.get('id')
         if grade_id:
             delete_grade(id)
             return Response({'Delete successful'})
         else:
-            return Response('grade_id query param need to be provided', status=status.HTTP_400_BAD_REQUEST)
+            return Response('id query param need to be provided', status=status.HTTP_400_BAD_REQUEST)
 
 class StudentConductView(APIView, PaginationHandlerMixin):
     # permission_classes = (IsAdminUser, IsAuthenticated)
@@ -198,6 +217,14 @@ class StudentConductView(APIView, PaginationHandlerMixin):
         except serializers.ValidationError:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Conduct id')],
+        request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties=CONDUCT_PROP,
+        ),
+    )
     def put(self, request):
         # Need id
         id = request.query_params.get('id')
@@ -214,6 +241,9 @@ class StudentConductView(APIView, PaginationHandlerMixin):
             return Response('id query param need to be provided', status=status.HTTP_400_BAD_REQUEST)
 
 
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Grade id')],
+    )
     def delete(self, request):
         id = request.query_params.get('id')
         if id:
@@ -260,6 +290,13 @@ class ParentView(APIView, PaginationHandlerMixin):
         except serializers.ValidationError:
             return Response(parent.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Parent id')],
+        request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties=PARENT_PROP,
+        ),
+    )
     def put(self, request):
         id = request.query_params.get('id')
         if id:
@@ -275,6 +312,10 @@ class ParentView(APIView, PaginationHandlerMixin):
         else:
             return Response('id query param need to be provided', status=status.HTTP_400_BAD_REQUEST)
 
+
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Grade id')],
+    )
     def delete(self, request):
         id = request.query_params.get('id')
         if id:

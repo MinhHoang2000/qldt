@@ -61,7 +61,7 @@ class RegisterView(APIView):
     @swagger_auto_schema(request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties=SIGNUP_ACCOUNT_PROP,
-        required = ['username', 'password', 'is_admin']))
+        required = SIGNUP_ACCOUNT_REQUIRED))
     def post(self, request):
         is_admin = request.data.get('is_admin', False)
         account = create_account(request.data, is_admin=is_admin)
@@ -71,6 +71,9 @@ class AccountView(APIView, PaginationHandlerMixin):
     # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
+    @swagger_auto_schema(request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties=SIGNUP_ACCOUNT_PROP))
     def put(self, request, pk):
         user = get_account(pk)
         update_account(user, request.data)
@@ -118,6 +121,9 @@ class PermissionView(APIView, PaginationHandlerMixin):
         except serializers.ValidationError:
             return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Permission id')],
+    )
     def delete(self, request):
         id = request.query_params.get('id')
         if id:

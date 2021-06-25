@@ -23,7 +23,6 @@ urlpatterns = [
 
     # classroom
     path('classes', ClassroomView.as_view()),
-    path('classes/records', ClassRecordView.as_view()),
 
     path('timetable', TimetableView.as_view()),
     path('timetable/new', TimetableCreateView.as_view()),
@@ -32,6 +31,7 @@ urlpatterns = [
     path('timetable/search/details', SearchTimetableView.as_view()),
     path('timetable/student/<int:pk>', TimetableStudentView.as_view()),
 
+    path('records', ClassRecordView.as_view()),
     # course
     path('courses', CourseView.as_view()),
 

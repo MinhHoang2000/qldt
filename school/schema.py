@@ -1,8 +1,56 @@
 from drf_yasg import openapi
 
+CLASSROOM_PROP = {
+    'class_name' : openapi.Schema(type=openapi.TYPE_STRING, description='Classroom name'),
+    'homeroom_teacher_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Homeroom teacher id'),
+    'location' : openapi.Schema(type=openapi.TYPE_STRING, description='Location'),
+}
+
+CLASSROOM_REQUIRED = ['class_name', 'homeroom_teacher_id', 'location']
+
+
 COURSE_PROP = {
     'course_name': openapi.Schema(type=openapi.TYPE_STRING, description='Course name'),
     'group_course': openapi.Schema(type=openapi.TYPE_STRING, description='Sc for Science, So for society and Py for physical'),
+}
+
+TIMETABLE_PROP = {
+    'classroom_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Classroom id'),
+    'teacher_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Teacher id'),
+    'course_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Course id'),
+    'day_of_week': openapi.Schema(type=openapi.TYPE_STRING, description='Mon, Tue, Wed,..., Sun'),
+    'shifts': openapi.Schema(type=openapi.TYPE_INTEGER, description='Shifts'),
+    'semester': openapi.Schema(type=openapi.TYPE_INTEGER, description='Semester'),
+    'school_year' : openapi.Schema(type=openapi.TYPE_INTEGER, description='Shool year'),
+}
+
+TIMETABLE_REQURIED = ['classroom_id', 'teacher_id', 'course_id', 'day_of_week', 'shifts', 'semester', 'school_year']
+
+TIMETABLE_CHANGE_PROP = {
+    'teacher_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Teacher id'),
+    'course_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Course id'),
+}
+
+CLASSRECORD_PROP = {
+    'classroom_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Classroom id'),
+    'teacher_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Teacher id'),
+    'course_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Course id'),
+    'day_of_week': openapi.Schema(type=openapi.TYPE_STRING, description='Mon, Tue, Wed,..., Sun'),
+    'shifts': openapi.Schema(type=openapi.TYPE_INTEGER, description='Shifts'),
+    'semester': openapi.Schema(type=openapi.TYPE_INTEGER, description='Semester'),
+    'school_year' : openapi.Schema(type=openapi.TYPE_INTEGER, description='Shool year'),
+    'attendant': openapi.Schema(type=openapi.TYPE_INTEGER, description='Attendant'),
+    'note': openapi.Schema(type=openapi.TYPE_STRING, description='Note'),
+}
+
+CLASSRECORD_REQUIRED = ['classroom_id', 'teacher_id', 'course_id', 'day_of_week', 'shifts', 'study_week', 'attendant', 'semester', 'school_year']
+
+
+CLASSRECORD_CHANGE_PROP = {
+    'teacher_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Teacher id'),
+    'course_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Course id'),
+    'attendant': openapi.Schema(type=openapi.TYPE_INTEGER, description='Attendant'),
+    'note': openapi.Schema(type=openapi.TYPE_STRING, description='Note'),
 }
 
 COURSE_REQUIRED = ['course_name', 'group_course']

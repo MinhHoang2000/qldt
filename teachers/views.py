@@ -41,7 +41,7 @@ EXPIRED_DAYS = 30
 # # Show class, course , ... which current teacher teaches
 class TeachingInfoView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
-    queryset = TeachingInfo.objects.all()
+    queryset = Timetable.objects.all()
     serializer_class = TeachingInfoSerializer
     filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
     ordering_fields = ['school_year', 'semester', 'teacher__person', 'id']
@@ -54,7 +54,8 @@ class TeachingInfoView(generics.ListAPIView):
         except Exception:
             raise serializers.ValidationError('Your account is don\'t have permissions to acess this information')
 
-        teching_info_list = TeachingInfo.objects.filter(teacher=teacher)
+
+        teching_info_list = Timetable.objects.filter(teacher=teacher)
         return teching_info_list
 
 

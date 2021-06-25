@@ -1,8 +1,10 @@
 # from os import name
 from django.urls import path
-from .views import TeachingInfoView, StudentView, StudentGradeView, ClassRecordView, StudyDocumentView, UploadStudyDocumentView, TimetableView, ClassTimetableView, StudentConductView, DeviceView, DeviceManageView
+from .views import TeachingInfoView, StudentView, StudentGradeView, ClassRecordView, StudyDocumentView, UploadStudyDocumentView, TimetableView, ClassTimetableView, StudentConductView, DeviceView, DeviceManageView, TeacherView
 
 urlpatterns = [
+
+    path('info', TeacherView.as_view()),
     path('teaching_info', TeachingInfoView.as_view(), name='teaching_information'),
 
     path('classes/<int:class_id>/students', StudentView.as_view(), name='list_student_of_class'),

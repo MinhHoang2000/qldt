@@ -38,6 +38,20 @@ EXPIRED_DAYS = 30
 
 # # Create your views here.
 
+
+class TeacherView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        try:
+            teacher = Teacher.objects.get(account=user)
+            serializer = TeacherSerializer(teacher)
+            return Response(serializer.data)
+        except Exception:
+            raise serializers.ValidationError('Your account is don\'t have permissions to acess this information')
+
+
 # # Show class, course , ... which current teacher teaches
 class TeachingInfoView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]

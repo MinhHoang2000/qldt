@@ -11,6 +11,10 @@ from school.models import Course, Device, StudyDocument, TeachingInfo
 from school.serializers import CourseSerializer, DeviceSerializer, DeviceManageSerializer, StudyDocumentSerializer, TeachingInfoSerializer
 from school.utils import get_course, delete_course, get_device, delete_device, get_device_manage, get_file, delete_file, get_teaching_info, delete_teaching_info
 
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+from school.schema import COURSE_PROP, COURSE_REQUIRED, DEVICE_PROP, DEVICE_REQUIRED
+
 from config import settings
 import os
 import mimetypes
@@ -43,6 +47,10 @@ class CourseView(APIView, PaginationHandlerMixin):
             serializer = self.get_paginated_response(CourseSerializer(page, many=True).data)
         return Response(serializer.data)
 
+    @swagger_auto_schema(request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties=COURSE_PROP,
+        required=COURSE_REQUIRED))
     def post(self, request):
         serializer = CourseSerializer(data=request.data)
         try:
@@ -74,59 +82,6 @@ class CourseView(APIView, PaginationHandlerMixin):
         else:
             return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
 
-class TeachingInfoView(APIView, PaginationHandlerMixin):
-    # permission_classes = (IsAdminUser, IsAuthenticated)
-    pagination_class = Pagination
-
-    def get(self, request):
-        teaching_info = TeachingInfo.objects.all()
-
-        # Get query params for sort or id
-        id = request.query_params.get('id')
-        sort = request.query_params.get(ORDERING_PARAM)
-
-        if id:
-            teaching_info = teaching_info.filter(id=id)
-        if sort:
-            teaching_info = teaching_info.order_by(f'{sort}')
-
-        serializer = TeachingInfoSerializer(teaching_info, many=True)
-        page = self.paginate_queryset(teaching_info)
-        if page:
-            serializer = self.get_paginated_response(TeachingInfoSerializer(page, many=True).data)
-        return Response(serializer.data)
-
-    def post(self, request):
-        serializer = TeachingInfoSerializer(data=request.data)
-        try:
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        except serializers.ValidationError:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def put(self, request):
-        id = request.query_params.get('id')
-        if id:
-            teaching_info = get_teaching_info(id)
-            serializer = TeachingInfoSerializer(teaching_info, data=request.data, partial=True)
-            try:
-                serializer.is_valid(raise_exception=True)
-                serializer.save()
-                return Response(serializer.data)
-            except serializers.ValidationError:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request):
-        id = request.query_params.get('id')
-        if id:
-            delete_teaching_info(id)
-            return Response('Delete successful')
-        else:
-            return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
-
 
 # Device
 class DeviceView(APIView, PaginationHandlerMixin):
@@ -154,6 +109,11 @@ class DeviceView(APIView, PaginationHandlerMixin):
 
 class DeviceAddView(APIView):
     # permission_classes = (IsAdminUser, IsAuthenticated)
+
+    @swagger_auto_schema(request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties=DEVICE_PROP,
+        required=DEVICE_REQUIRED))
     def post(self, request):
         serializer = DeviceSerializer(data=request.data)
         try:

@@ -20,7 +20,6 @@ urlpatterns = [
 
     # teacher
     path('teachers', TeacherView.as_view()),
-    path('teaching_info', TeachingInfoView.as_view()),
 
     # classroom
     path('classes', ClassroomView.as_view()),

@@ -115,7 +115,6 @@ class Device(models.Model):
     amount = models.IntegerField()
     price = models.IntegerField()
 
-
     class Meta:
         db_table = 'device'
 

@@ -7,13 +7,13 @@ from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
 from rest_framework.response import Response
 from config.pagination import Pagination, PaginationHandlerMixin
 
-from school.models import Course, Device, StudyDocument, TeachingInfo
+from school.models import Course, Device, StudyDocument, TeachingInfo, DeviceManage
 from school.serializers import CourseSerializer, DeviceSerializer, DeviceManageSerializer, StudyDocumentSerializer, TeachingInfoSerializer
 from school.utils import get_course, delete_course, get_device, delete_device, get_device_manage, get_file, delete_file, get_teaching_info, delete_teaching_info
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-from school.schema import COURSE_PROP, COURSE_REQUIRED, DEVICE_PROP, DEVICE_REQUIRED
+from school.schema import COURSE_PROP, COURSE_REQUIRED, DEVICE_PROP, DEVICE_REQUIRED, DEVICE_MANAGE_PROP, DEVICE_MANAGE_REQUIRED, STUDY_DOC_PROP, STUDY_DOC_REQUIRED
 
 from config import settings
 import os
@@ -145,41 +145,45 @@ class DeviceManageView(APIView, PaginationHandlerMixin):
     # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
+    @swagger_auto_schema(
+        manual_parameters=[
+        openapi.Parameter('device_id', openapi.IN_QUERY, description="Device id", type=openapi.TYPE_INTEGER)],
+    )
     def get(self, request):
         device_id = request.query_params.get('device_id')
-        if device_id:
-            device = get_device(device_id)
-            device_manages = device.device_manages.all()
+        device_manages = DeviceManage.objects.all()
 
-            # Get query param for sort
-            sort = request.query_params.get(ORDERING_PARAM)
-            if sort:
-                device_manages = device_manages.order_by(f'{sort}')
+        if(device_id):
+            device_manages = device_manages.filter(device_id=device_id)
 
-            serializer = DeviceManageSerializer(device_manages, many=True)
+        # Get query param for sort
+        sort = request.query_params.get(ORDERING_PARAM)
+        if sort:
+            device_manages = device_manages.order_by(f'{sort}')
 
-            page = self.paginate_queryset(device_manages)
-            if page:
-                serializer = self.get_paginated_response(DeviceManageSerializer(page, many=True).data)
+        serializer = DeviceManageSerializer(device_manages, many=True)
 
-            return Response(serializer.data)
+        page = self.paginate_queryset(device_manages)
+        if page:
+            serializer = self.get_paginated_response(DeviceManageSerializer(page, many=True).data)
 
-        else:
-            return Response({'device_id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.data)
 
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties=DEVICE_MANAGE_PROP,
+            required=DEVICE_MANAGE_REQUIRED)
+    )
     def post(self, request):
-        device_id = request.query_params.get('device_id')
-        if device_id:
-            request.data.update({'device_id': device_id})
-            serializer = DeviceManageSerializer(data=request.data)
-            try:
-                serializer.is_valid(raise_exception=True)
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            except serializers.ValidationError as error:
-                return Response(error.detail, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({'device_id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = DeviceManageSerializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except serializers.ValidationError as error:
+            return Response(error.detail, status=status.HTTP_400_BAD_REQUEST)
+
 
     def put(self, request):
         device_manage_id = request.query_params.get('device_manage_id')
@@ -202,6 +206,8 @@ class DeviceManageView(APIView, PaginationHandlerMixin):
             return Response({'Delete successful'})
         else:
             return Response({'device_manage_id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 
 # StudyDocument
@@ -237,6 +243,14 @@ class StudyDocumentView(APIView, PaginationHandlerMixin):
 
         return Response(serializer.data)
 
+
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties=STUDY_DOC_PROP,
+            required=STUDY_DOC_REQUIRED,
+        )
+    )
     def post(self, request):
         serializer = StudyDocumentSerializer(data=request.data)
         try:

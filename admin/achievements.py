@@ -16,6 +16,9 @@ from persons.utils import get_achievement, delete_achievement
 from students.utils import get_student
 from teachers.utils import get_teacher
 
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+from persons.schema import ACHIEVEMENT_PROP, ACHIEVEMENT_REQUIRED, ACHIEVEMENT_STUDENT_PROP, ACHIEVEMENT_TEACHER_PROP
 
 from config.settings import REST_FRAMEWORK
 
@@ -43,6 +46,10 @@ class AchievementView(APIView, PaginationHandlerMixin):
             serializer = self.get_paginated_response(AchievementSerializer(page, many=True).data)
         return Response(serializer.data)
 
+    @swagger_auto_schema(request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties=ACHIEVEMENT_PROP,
+        required=ACHIEVEMENT_REQUIRED))
     def post(self, request):
         achievement = AchievementSerializer(data=request.data)
         try:
@@ -99,6 +106,12 @@ class StudentAchievementView(APIView, PaginationHandlerMixin):
 
         return Response(serializer.data)
 
+    @swagger_auto_schema(
+        manual_parameters=[
+        openapi.Parameter('student_id', openapi.IN_QUERY, description="Student id", type=openapi.TYPE_INTEGER)],
+        request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties=ACHIEVEMENT_STUDENT_PROP))
     def put(self, request):
         id = request.query_params.get('student_id')
         if id:
@@ -136,6 +149,13 @@ class TeacherAchievementView(APIView, PaginationHandlerMixin):
 
         return Response(serializer.data)
 
+
+    @swagger_auto_schema(
+        manual_parameters=[
+        openapi.Parameter('teacher_id', openapi.IN_QUERY, description="Teacher id", type=openapi.TYPE_INTEGER)],
+        request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties=ACHIEVEMENT_TEACHER_PROP))
     def put(self, request):
         id = request.query_params.get('teacher_id')
         if id:

@@ -35,6 +35,7 @@ CLASSRECORD_PROP = {
     'classroom_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Classroom id'),
     'teacher_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Teacher id'),
     'course_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Course id'),
+    'classification': openapi.Schema(type=openapi.TYPE_STRING, description='from A to F'),
     'day_of_week': openapi.Schema(type=openapi.TYPE_STRING, description='Mon, Tue, Wed,..., Sun'),
     'shifts': openapi.Schema(type=openapi.TYPE_INTEGER, description='Shifts'),
     'semester': openapi.Schema(type=openapi.TYPE_INTEGER, description='Semester'),
@@ -47,6 +48,7 @@ CLASSRECORD_REQUIRED = ['classroom_id', 'teacher_id', 'course_id', 'day_of_week'
 
 
 CLASSRECORD_CHANGE_PROP = {
+    'classification': openapi.Schema(type=openapi.TYPE_STRING, description='from A to F'),
     'course_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Course id'),
     'attendant': openapi.Schema(type=openapi.TYPE_INTEGER, description='Attendant'),
     'note': openapi.Schema(type=openapi.TYPE_STRING, description='Note'),

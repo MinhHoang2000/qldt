@@ -70,7 +70,7 @@ class RecordSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ClassRecord
-        fields = ['id', 'classroom', 'teacher', 'course', 'day_of_week', 'shifts', 'study_week', 'total_student', 'attendant', 'note', 'semester', 'school_year']
+        fields = ['id', 'classroom', 'teacher', 'course', 'day_of_week', 'shifts', 'study_week', 'total_student', 'attendant', 'note', 'semester', 'school_year', 'classification']
 
     def create(self, validated_data):
         classroom_id = validated_data.get('classroom_id')
@@ -97,6 +97,7 @@ class RecordSerializer(serializers.ModelSerializer):
             pass
 
         instance.attendant = validated_data.get('attendant', instance.attendant)
+        instance.classification = validated_data.get('classification', instance.classification)
         instance.note = validated_data.get('note', instance.note)
         instance.save()
         return instance

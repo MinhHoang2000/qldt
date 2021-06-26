@@ -139,7 +139,7 @@ class StudentAchievementView(APIView, PaginationHandlerMixin):
 
 
 class TeacherAchievementView(APIView, PaginationHandlerMixin):
-    permission_classes = (IsAdminUser, IsAuthenticated)
+    # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
     @swagger_auto_schema(

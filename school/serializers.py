@@ -28,13 +28,16 @@ class CourseSerializer(serializers.ModelSerializer):
 
 
 class TimetableSerializer(serializers.ModelSerializer):
-    classroom = ClassroomSerializer()
-    teacher = TeacherSerializer()
-    course = CourseSerializer()
+    classroom = ClassroomSerializer(read_only=True)
+    teacher = TeacherSerializer(read_only=True)
+    course = CourseSerializer(read_only=True)
+    classroom_id = serializers.IntegerField(write_only=True)
+    teacher_id = serializers.IntegerField(write_only=True)
+    course_id = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = Timetable
-        fields = ['id', 'day_of_week', 'shifts', 'semester', 'school_year', 'course', 'teacher', 'classroom']
+        fields = ['id', 'day_of_week', 'shifts', 'semester', 'school_year', 'course', 'teacher', 'classroom', 'classroom_id', 'course_id', 'teacher_id']
 
     def create(self, validated_data):
         classroom_id = validated_data.get('classroom_id')

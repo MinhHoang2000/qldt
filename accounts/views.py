@@ -58,7 +58,7 @@ class ProfileView(APIView):
         elif request.user.student.exists():
             student = request.user.student.first()
             profile = StudentProfileSerializer(student)
-        elif request.user.student.exists():
+        elif request.user.teacher.exists():
             teacher = request.user.teacher.first()
             profile = TeacherProfileSerializer(teacher)
         else:

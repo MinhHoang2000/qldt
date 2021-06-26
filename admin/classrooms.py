@@ -174,7 +174,7 @@ class SearchTimetableView(APIView, PaginationHandlerMixin):
     # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
-    def get(self, request):
+    def post(self, request):
         timetables = Timetable.objects.all()
 
         # Sort
@@ -185,7 +185,7 @@ class SearchTimetableView(APIView, PaginationHandlerMixin):
         class_name = request.data.get('class_name', '')
         course_name = request.data.get('course_name', '')
 
-        timetables.filter(teacher__person_first_name__contains=teacher_name,
+        timetables = timetables.filter(teacher__person__first_name__contains=teacher_name,
                           course__course_name__contains=course_name,
                           classroom__class_name__contains=class_name)
 

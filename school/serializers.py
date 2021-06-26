@@ -70,8 +70,8 @@ class RecordSerializer(serializers.ModelSerializer):
     teacher = TeacherSerializer(read_only=True)
     course = CourseSerializer(read_only=True)
     classroom_id = serializers.IntegerField(write_only=True)
-    teacher_id = serializers.IntegerField(write_only=True)
-    course_id = serializers.IntegerField(write_only=True)
+    teacher_id = serializers.IntegerField(write_only=True, required=False, allow_null=True)
+    course_id = serializers.IntegerField(write_only=True, required=False, allow_null=True)
     total_student = serializers.SerializerMethodField()
 
     class Meta:
@@ -88,7 +88,8 @@ class RecordSerializer(serializers.ModelSerializer):
         attendant = validated_data.get('attendant')
 
         validate_classroom_record(classroom_id, day_of_week, shifts, study_week, semester, school_year)
-        validate_classroom_attendant(classroom_id, attendant)
+        if attendant:
+            validate_classroom_attendant(classroom_id, attendant)
 
         return ClassRecord.objects.create(**validated_data)
 

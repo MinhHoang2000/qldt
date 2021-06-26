@@ -4,7 +4,7 @@ from rest_framework import status, serializers
 from rest_framework.response import Response
 from config.pagination import Pagination, PaginationHandlerMixin
 
-from school.models import Classroom, Timetable
+from school.models import Classroom, Timetable, ClassRecord
 from school.serializers import ClassroomSerializer, TimetableSerializer, RecordSerializer
 from school.utils import get_classroom, get_timetable, get_record, delete_timetable, delete_record
 from students.utils import get_student
@@ -216,7 +216,7 @@ class ClassRecordView(APIView, PaginationHandlerMixin):
     )
     def get(self, request):
 
-        records = classroom.classrecords.all()
+        records = ClassRecord.objects.all()
         # query_set
         class_id = request.query_params.get('classroom_id')
         teacher_id = request.query_params.get('teacher_id')

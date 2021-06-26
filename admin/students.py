@@ -112,6 +112,8 @@ class StudentGradeView(APIView, PaginationHandlerMixin):
 
     @swagger_auto_schema(
         manual_parameters=[
+            openapi.Parameter('student_id', openapi.IN_QUERY, description="Student id", type=openapi.TYPE_INTEGER),
+            openapi.Parameter('classroom_id', openapi.IN_QUERY, description="Classroom id", type=openapi.TYPE_INTEGER),
             openapi.Parameter('course_id', openapi.IN_QUERY, description="Course id", type=openapi.TYPE_INTEGER),
             openapi.Parameter('school_year', openapi.IN_QUERY, description="School year", type=openapi.TYPE_STRING),
             openapi.Parameter('semester', openapi.IN_QUERY, description="Semester", type=openapi.TYPE_INTEGER),
@@ -122,11 +124,17 @@ class StudentGradeView(APIView, PaginationHandlerMixin):
         grades = Grade.objects.all()
 
         # query_set
+        student_id = request.query_params.get('student_id')
+        classroom_id = request.query_params.get('classroom_id')
         course_id = request.query_params.get('course_id')
         semester = request.query_params.get('semester')
         school_year = request.query_params.get('school_year')
         sort = request.query_params.get(ORDERING_PARAM)
 
+        if student_id:
+            grades = grades.filter(student_id=student_id)
+        if classroom_id:
+            grades = grades.filter(student__classroom__id=classroom_id)
         if course_id:
             grades = grades.filter(course_id=course_id)
         if semester:

@@ -112,7 +112,6 @@ class Device(models.Model):
     id = models.AutoField(primary_key=True)
     status = models.CharField(max_length=1, choices=DEVICE_STATUS, default='N')
     device_name = models.CharField(max_length=128)
-    amount = models.IntegerField(null=True)
     price = models.IntegerField(null=True)
 
     class Meta:

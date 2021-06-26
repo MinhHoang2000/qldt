@@ -49,6 +49,7 @@ CLASSRECORD_REQUIRED = ['classroom_id', 'teacher_id', 'course_id', 'day_of_week'
 
 
 CLASSRECORD_CHANGE_PROP = {
+    'teacher_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Teacher id, not necessary for teacher view'),
     'classification': openapi.Schema(type=openapi.TYPE_STRING, description='from A to F'),
     'course_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Course id'),
     'attendant': openapi.Schema(type=openapi.TYPE_INTEGER, description='Attendant'),
@@ -59,17 +60,16 @@ COURSE_REQUIRED = ['course_name', 'group_course']
 
 DEVICE_PROP = {
     'status': openapi.Schema(type=openapi.TYPE_STRING, description='N for normal, B for broken, O for old'),
-    'device_name': openapi.Schema(type=openapi.TYPE_INTEGER, description='Device name'),
-    'amount': openapi.Schema(type=openapi.TYPE_INTEGER, description='Amount of device'),
+    'device_name': openapi.Schema(type=openapi.TYPE_STRING, description='Device name'),
     'price': openapi.Schema(type=openapi.TYPE_INTEGER, description='Price of each device'),
 }
 
 
-DEVICE_REQUIRED = ['status', 'device_name', 'amount', 'price']
+DEVICE_REQUIRED = ['status', 'device_name', 'price']
 
 DEVICE_MANAGE_PROP = {
     'device_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Device id'),
-    'day_of_week': openapi.Schema(type=openapi.TYPE_INTEGER, description='Mon, Tue, Wed,.., Sun'),
+    'day_of_week': openapi.Schema(type=openapi.TYPE_STRING, description='Mon, Tue, Wed,.., Sun'),
     'shifts': openapi.Schema(type=openapi.TYPE_INTEGER, description='Shifts'),
     'week': openapi.Schema(type=openapi.TYPE_INTEGER, description='Week of study'),
     'teacher_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Teacher id'),

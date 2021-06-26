@@ -152,7 +152,7 @@ class DeviceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Device
-        fields = ['id', 'status', 'device_name', 'device_manages', 'amount', 'price']
+        fields = ['id', 'status', 'device_name', 'device_manages', 'price']
 
 
 class StudyDocumentSerializer(serializers.ModelSerializer):

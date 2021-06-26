@@ -35,12 +35,9 @@ class CourseView(APIView, PaginationHandlerMixin):
     def get(self, request):
         courses = Course.objects.all()
 
-        # Get query params for sort or id
-        id = request.query_params.get('id')
+        # Get query params for sort
         sort = request.query_params.get(ORDERING_PARAM)
 
-        if id:
-            courses = courses.filter(id=id)
         if sort:
             courses = courses.order_by(f'{sort}')
 
@@ -99,14 +96,15 @@ class DeviceView(APIView, PaginationHandlerMixin):
     # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('sort', openapi.IN_QUERY, type=openapi.TYPE_STRING, description='status, device_name, amount or price')],
+    )
     def get(self, request):
         devices = Device.objects.all()
 
-        # Get query param for id or sort
-        id = request.query_params.get('id')
+        # Get query param for sort
         sort = request.query_params.get(ORDERING_PARAM)
-        if id:
-            devices = devices.filter(id=id)
+
         if sort:
             devices = devices.order_by(f'{sort}')
 
@@ -152,7 +150,7 @@ class DeviceChangeDeleteView(APIView):
             return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
-        delete_device(id)
+        delete_device(pk)
         return Response({'Delete successful'})
 
 

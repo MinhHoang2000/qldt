@@ -11,7 +11,7 @@ CLASSROOM_REQUIRED = ['class_name', 'homeroom_teacher_id', 'location']
 
 COURSE_PROP = {
     'course_name': openapi.Schema(type=openapi.TYPE_STRING, description='Course name'),
-    'group_course': openapi.Schema(type=openapi.TYPE_STRING, description='Sc for Science, So for society and Py for physical'),
+    'group_course': openapi.Schema(type=openapi.TYPE_STRING, description='Sc for Science, So for society and Ph for physical'),
 }
 
 TIMETABLE_PROP = {

@@ -27,6 +27,9 @@ from drf_yasg import openapi
 import logging
 logger = logging.getLogger(__name__)
 
+from config.settings import REST_FRAMEWORK
+
+ORDERING_PARAM = REST_FRAMEWORK['ORDERING_PARAM']
 
 # Account
 
@@ -34,17 +37,25 @@ class ListAccountView(APIView, PaginationHandlerMixin):
     # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('sort', openapi.IN_QUERY, type=openapi.TYPE_STRING, description='username, id'),
+            openapi.Parameter('account_type', openapi.IN_QUERY, type=openapi.TYPE_STRING, description='admin, student, teacher')
+        ]
+    )
     def get(self, request):
         accounts = get_user_model().objects.all()
 
-        username = request.query_params.get('username')
-        id = request.query_params.get('id')
-        sort = request.query_params.get('sort_by')
+        sort = request.query_params.get(ORDERING_PARAM)
+        account_type = request.query_params.get('account_type')
 
-        if username:
-            accounts = accounts.filter(username=username)
-        if id:
-            accounts = accounts.filter(id=id)
+        if account_type == 'admin':
+            accounts = accounts.filter(is_admin=True)
+        elif account_type == 'teacher':
+            accounts = accounts.filter(teacher__isnull=False).distinct()
+        elif account_type == 'student':
+            accounts = accounts.filter(student__isnull=False).distinct()
+
         if sort:
             accounts = accounts.order_by(f'{sort}')
 

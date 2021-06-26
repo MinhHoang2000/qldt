@@ -21,21 +21,31 @@ ORDERING_PARAM = REST_FRAMEWORK['ORDERING_PARAM']
 class StudentView(APIView, PaginationHandlerMixin):
     # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('classroom_id', openapi.IN_QUERY, description="Classroom id", type=openapi.TYPE_INTEGER),
+            openapi.Parameter('status', openapi.IN_QUERY, description="Status", type=openapi.TYPE_STRING),
+            openapi.Parameter('admission_year', openapi.IN_QUERY, description="Admission year", type=openapi.TYPE_INTEGER),
+            openapi.Parameter('sort', openapi.IN_QUERY, type=openapi.TYPE_STRING, description='admission_year, status, person__first_name, person__last_name'),
+        ],
+
+    )
     def get(self, request):
         students = Student.objects.all()
 
         # query_set
-        id = request.query_params.get('id')
         status = request.query_params.get('status')
         admission_year = request.query_params.get('admission_year')
+        classroom_id = request.query_params.get('classroom_id')
         sort = request.query_params.get(ORDERING_PARAM)
 
-        if id:
-            students = students.filter(id=id)
         if status:
             students = students.filter(status=status)
         if admission_year:
             students = students.filter(admission_year=admission_year)
+        if classroom_id:
+            students = students.filter(classroom_id=classroom_id)
         if sort:
             students = students.order_by(f'{sort}')
 
@@ -100,16 +110,27 @@ class StudentGradeView(APIView, PaginationHandlerMixin):
     # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('course_id', openapi.IN_QUERY, description="Course id", type=openapi.TYPE_INTEGER),
+            openapi.Parameter('school_year', openapi.IN_QUERY, description="School year", type=openapi.TYPE_STRING),
+            openapi.Parameter('semester', openapi.IN_QUERY, description="Semester", type=openapi.TYPE_INTEGER),
+            openapi.Parameter('sort', openapi.IN_QUERY, type=openapi.TYPE_STRING, description='final_test, mid_term_test'),
+        ],
+    )
     def get(self, request):
         grades = Grade.objects.all()
 
         # query_set
-        term = request.query_params.get('term')
+        course_id = request.query_params.get('course_id')
+        semester = request.query_params.get('semester')
         school_year = request.query_params.get('school_year')
         sort = request.query_params.get(ORDERING_PARAM)
 
-        if term:
-            grades = grades.filter(term=term)
+        if course_id:
+            grades = grades.filter(course_id=course_id)
+        if semester:
+            grades = grades.filter(semester=semester)
         if school_year:
             grades = grades.filter(school_year=school_year)
         if sort:
@@ -178,16 +199,24 @@ class StudentConductView(APIView, PaginationHandlerMixin):
     # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('school_year', openapi.IN_QUERY, description="School year", type=openapi.TYPE_STRING),
+            openapi.Parameter('semester', openapi.IN_QUERY, description="Semester", type=openapi.TYPE_INTEGER),
+            openapi.Parameter('sort', openapi.IN_QUERY, type=openapi.TYPE_STRING, description='score'),
+        ],
+
+    )
     def get(self, request):
         conducts = Conduct.objects.all()
 
         # query_set
-        term = request.query_params.get('term')
+        semester = request.query_params.get('semester')
         school_year = request.query_params.get('school_year')
         sort = request.query_params.get(ORDERING_PARAM)
 
-        if term:
-            conducts = conducts.filter(term=term)
+        if semester:
+            conducts = conducts.filter(term=semester)
         if school_year:
             conducts = conducts.filter(school_year=school_year)
         if sort:
@@ -258,12 +287,16 @@ class ParentView(APIView, PaginationHandlerMixin):
     # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('sort', openapi.IN_QUERY, type=openapi.TYPE_STRING, description='person__first_name, person__last_name'),
+        ],
+
+    )
     def get(self, request):
         parents = Parent.objects.all()
-        id = request.query_params.get('id')
         sort = request.query_params.get(ORDERING_PARAM)
-        if id:
-            parents = parents.filter(id=id)
+
         if sort:
             parents = parents.order_by(f'{sort}')
 

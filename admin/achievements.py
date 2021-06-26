@@ -28,14 +28,15 @@ class AchievementView(APIView, PaginationHandlerMixin):
     # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('sort', openapi.IN_QUERY, type=openapi.TYPE_STRING, description='achievement_name, created_at')],
+    )
     def get(self, request):
         achievements = Achievement.objects.all()
 
         # queryset
-        id = request.query_params.get('id')
         sort = request.query_params.get(ORDERING_PARAM)
-        if id:
-            achievements = achievements.filter(id=id)
+
         if sort:
             achievements = achievements.order_by(f'{sort}')
 
@@ -95,22 +96,23 @@ class StudentAchievementView(APIView, PaginationHandlerMixin):
     # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('sort', openapi.IN_QUERY, type=openapi.TYPE_STRING, description='achievement_name, created_at'),
+                           openapi.Parameter('classroom_id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Classroom id')],
+    )
     def get(self, request):
-        id = request.query_params.get('student_id')
-
         sort = request.query_params.get(ORDERING_PARAM)
+        classroom_id = request.query_params.get('classroom_id')
+        students = Student.objects.filter(achievements__isnull=False).distinct()
 
-        if id:
-            student = get_student(id)
-            serializer = StudentAchievementSerializer(student)
-        else:
-            students = Student.objects.filter(achievements__isnull=False).distinct()
-            if sort:
-                students = students.order_by(f'{sort}')
-            serializer = StudentAchievementSerializer(students, many=True)
-            page = self.paginate_queryset(students)
-            if page:
-                serializer = self.get_paginated_response(StudentAchievementSerializer(page, many=True).data)
+        if classroom_id:
+            students = students.filter(classroom_id=classroom_id)
+        if sort:
+            students = students.order_by(f'achievement__{sort}')
+        serializer = StudentAchievementSerializer(students, many=True)
+        page = self.paginate_queryset(students)
+        if page:
+            serializer = self.get_paginated_response(StudentAchievementSerializer(page, many=True).data)
 
         return Response(serializer.data)
 
@@ -140,20 +142,18 @@ class TeacherAchievementView(APIView, PaginationHandlerMixin):
     permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('sort', openapi.IN_QUERY, type=openapi.TYPE_STRING, description='achievement_name, created_at')],
+    )
     def get(self, request):
-        id = request.query_params.get('teacher_id')
         sort = request.query_params.get(ORDERING_PARAM)
-        if id:
-            teacher = get_teacher(id)
-            serializer = TeacherAchievementSerializer(teacher)
-        else:
-            teachers = Teacher.objects.filter(achievements__isnull=False).distinct()
-            if sort:
-                teachers = teachers.order_by(f'{sort}')
-            serializer = TeacherAchievementSerializer(teachers, many=True)
-            page = self.paginate_queryset(teachers)
-            if page:
-                serializer = self.get_paginated_response(TeacherAchievementSerializer(page, many=True).data)
+        teachers = Teacher.objects.filter(achievements__isnull=False).distinct()
+        if sort:
+            teachers = teachers.order_by(f'{sort}')
+        serializer = TeacherAchievementSerializer(teachers, many=True)
+        page = self.paginate_queryset(teachers)
+        if page:
+            serializer = self.get_paginated_response(TeacherAchievementSerializer(page, many=True).data)
 
         return Response(serializer.data)
 

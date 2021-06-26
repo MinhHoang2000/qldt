@@ -171,13 +171,25 @@ class DeviceManageView(APIView, PaginationHandlerMixin):
     )
     def get(self, request):
         device_id = request.query_params.get('device_id')
+        teacher_id = request.query_params.get('teacher_id')
+        week = request.query_params.get('week')
+        shifts = request.query_params.get('shifts')
+        day_of_week = request.query_params.get('day_of_week')
+        sort = request.query_params.get(ORDERING_PARAM)
+
         device_manages = DeviceManage.objects.all()
 
+        # query params
         if(device_id):
             device_manages = device_manages.filter(device_id=device_id)
-
-        # Get query param for sort
-        sort = request.query_params.get(ORDERING_PARAM)
+        if teacher_id:
+            device_manages = device_manages.filter(teacher_id=teacher_id)
+        if week:
+            device_manages = device_manages.filter(week=week)
+        if shifts:
+            device_manages = device_manages.filter(shifts=shifts)
+        if day_of_week:
+            device_manages = device_manages.filter(day_of_week=day_of_week)
         if sort:
             device_manages = device_manages.order_by(f'{sort}')
 
@@ -242,21 +254,34 @@ class StudyDocumentView(APIView, PaginationHandlerMixin):
     pagination_class = Pagination
     parser_classes = (JSONParser, MultiPartParser, FileUploadParser)
 
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('teacher_id', openapi.IN_QUERY, description="Teacher id", type=openapi.TYPE_INTEGER),
+            openapi.Parameter('course_id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Course id'),
+            openapi.Parameter('classroom_id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Classroom id'),
+            openapi.Parameter('sort', openapi.IN_QUERY, type=openapi.TYPE_STRING, description='name'),
+            openapi.Parameter('study_week', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Study week'),
+        ],
+
+    )
     def get(self, request):
         files = StudyDocument.objects.all()
 
-        # Get query param for id or sort
-        id = request.query_params.get('id')
+        # Get query params
         sort = request.query_params.get(ORDERING_PARAM)
         course_id = request.query_params.get('course_id')
         teacher_id = request.query_params.get('teacher_id')
+        classroom_id = request.query_params.get('classroom_id')
+        study_week = request.query_params.get('study_week')
 
-        if id:
-            files = files.filter(id=id)
         if course_id:
             files = files.filter(course_id=course_id)
         if teacher_id:
             files = files.filter(teacher_id=teacher_id)
+        if classroom_id:
+            files = files.filter(classroom_id=classroom_id)
+        if study_week:
+            files = files.filter(study_week=study_week)
         if sort:
             files = files.order_by(f'{sort}')
 

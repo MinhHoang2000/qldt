@@ -1,3 +1,7 @@
+# Person Info
+```sql
+
+-- Teacher info
 insert into person_info(id, first_name, last_name, gender, date_of_birth, address, ethnicity, religion, phone_number)
 values (1, 'Ngoc', 'Nguyen Thi', 'F', '1984-04-23', '10 Hai Ba Trung, Ha Noi', 'Kinh', 'None', '09275445385'),
        (2, 'Mai', 'Tran Thi', 'F', '1985-04-10', '52 Ton That Tung, Ha Noi', 'Kinh', 'None', '09996894433'),
@@ -24,8 +28,10 @@ values (1, 'Ngoc', 'Nguyen Thi', 'F', '1984-04-23', '10 Hai Ba Trung, Ha Noi', '
        (23, 'Vy', 'Nguyen Thi', 'F', '1989-04-28', '167 Thuong Cat, Ha Noi', 'Kinh', 'None', '09483703004'),
        (24, 'Hue', 'Phi Thi', 'F', '1948-04-29', '481 Duong Lieu, Ha Noi', 'Kinh', 'None', '09850731524')
 
+```
 
-
+# Classroom
+```sql
 insert into classrom(class_name, location)
 values ('10A', 'B102', 1),
        ('10B', 'B103', 2),
@@ -51,7 +57,11 @@ values ('10A', 'B102', 1),
        ('12H', 'B307', 22),
        ('12G', 'B308', 23),
        ('12H', 'B309', 24)
+```
 
+# Course
+```sql
 insert into course(course_name, group_course)
 values
+```
 

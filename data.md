@@ -62,6 +62,17 @@ values ('10A', 'B102', 1),
 # Course
 ```sql
 insert into course(course_name, group_course)
-values
+values ('Toan', 'Sc'),
+       ('Ngu Van', 'So'),
+       ('Ngoai ngu', 'So'),
+       ('Giao duc con dan', 'So'),
+       ('Dia ly', 'Sc'),
+       ('Hoa hoc', 'Sc'),
+       ('Vat ly', 'Sc'),
+       ('Sinh hoc', 'Sc'),
+       ('Cong nghe', 'Sc'),
+       ('Tin hoc', 'Sc'),
+       ('Giao duc the chat', 'Ph'),
+       ('Giao duc quoc phong', 'Ph'),
 ```
 

@@ -24,14 +24,15 @@ class ClassroomView(APIView, PaginationHandlerMixin):
     # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('sort', openapi.IN_QUERY, type=openapi.TYPE_STRING, description='class_name, location')],
+
+    )
     def get(self, request):
         classrooms = Classroom.objects.all()
 
-        # Query param for id or sort
-        id = request.query_params.get('id')
+        # Query param
         sort = request.query_params.get(ORDERING_PARAM)
-        if id:
-            classrooms = classrooms.filter(id=id)
         if sort:
             classrooms = classrooms.order_by(f'{sort}')
 

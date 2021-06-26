@@ -29,6 +29,9 @@ class CourseView(APIView, PaginationHandlerMixin):
     # permission_classes = (IsAdminUser, IsAuthenticated)
     pagination_class = Pagination
 
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('sort', openapi.IN_QUERY, type=openapi.TYPE_STRING, description='course_name or group_course')],
+    )
     def get(self, request):
         courses = Course.objects.all()
 

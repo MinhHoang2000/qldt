@@ -63,8 +63,7 @@ class RegisterView(APIView):
         properties=SIGNUP_ACCOUNT_PROP,
         required = SIGNUP_ACCOUNT_REQUIRED))
     def post(self, request):
-        is_admin = request.data.get('is_admin', False)
-        account = create_account(request.data, is_admin=is_admin)
+        account = create_account(request.data, is_admin=True)
         return Response(status=status.HTTP_200_OK)
 
 class AccountView(APIView, PaginationHandlerMixin):
@@ -80,12 +79,8 @@ class AccountView(APIView, PaginationHandlerMixin):
         return Response(status=status.HTTP_200_OK)
 
     def delete(self, request, pk):
-        id = request.query_params.get('id')
-        if id:
-            delete_account(id)
-            return Response("Delete successful")
-        else:
-            return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
+        delete_account(pk)
+        return Response("Delete successful")
 
 
 class PermissionView(APIView, PaginationHandlerMixin):

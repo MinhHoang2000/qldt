@@ -6,7 +6,7 @@ urlpatterns = [
 
     # account
     path('account', ListAccountView.as_view()),
-    path('account/<int:pk>', AccountView.as_view()),
+    path('account/<pk>', AccountView.as_view()),
     path('account/signup', RegisterView.as_view()),
     path('permissions', PermissionView.as_view()),
 

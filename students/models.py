@@ -63,7 +63,7 @@ class Grade(models.Model):
 
 class Conduct(models.Model):
     id = models.AutoField(primary_key=True)
-    score = models.CharField(max_length=2, choices=SCORES)
+    score = models.CharField(max_length=2, choices=SCORES, null=True)
     semester = models.SmallIntegerField()
     school_year = models.SmallIntegerField()
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='conduct')

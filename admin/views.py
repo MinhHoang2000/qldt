@@ -12,7 +12,7 @@ from django.contrib.auth import get_user_model
 
 from accounts.serializers import AccountSerializer, PermissionSerializer
 
-from accounts.utils import create_account, update_account, delete_account, delete_permission
+from accounts.utils import create_account, update_account, delete_account, delete_permission, get_account
 
 from .students import *
 from .teachers import *

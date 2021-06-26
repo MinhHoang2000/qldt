@@ -92,12 +92,12 @@ class Timetable(models.Model):
 
 class ClassRecord(models.Model):
     id = models.AutoField(primary_key=True)
-    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, related_name='classrecords')
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, related_name='classrecords', null=True)
     classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE, related_name='classrecords')
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='classrecords')
-    classification = models.CharField(max_length=1, choices=CLASSIFICATION, default='A')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='classrecords', null=True)
+    classification = models.CharField(max_length=1, choices=CLASSIFICATION, default='A', null=True)
     study_week = models.SmallIntegerField()
-    attendant = models.SmallIntegerField()
+    attendant = models.SmallIntegerField(null=True)
     note = models.TextField(null=True)
     day_of_week = models.CharField(max_length=3, choices=DAY_OF_WEEK)
     shifts = models.SmallIntegerField()
@@ -112,8 +112,8 @@ class Device(models.Model):
     id = models.AutoField(primary_key=True)
     status = models.CharField(max_length=1, choices=DEVICE_STATUS, default='N')
     device_name = models.CharField(max_length=128)
-    amount = models.IntegerField()
-    price = models.IntegerField()
+    amount = models.IntegerField(null=True)
+    price = models.IntegerField(null=True)
 
     class Meta:
         db_table = 'device'

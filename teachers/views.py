@@ -30,11 +30,16 @@ import os
 import mimetypes
 from django.http import HttpResponse
 
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+from students.schema import GRADE_PROP, GRADE_CHANGE_PROP, CONDUCT_CHANGE_PROP
+from school.schema import CLASSRECORD_CHANGE_PROP, TEACHER_STUDY_DOC_PROP, TEACHER_STUDY_DOC_REQUIRED, TEACHER_DEVICE_MANAGE_PROP, TEACHER_DEVICE_MANAGE_REQUIRED
+
 from config.settings import REST_FRAMEWORK
 
 ORDERING_PARAM = REST_FRAMEWORK['ORDERING_PARAM']
 
-EXPIRED_DAYS = 30
+EXPIRED_DAYS = 30 * 5
 
 # # Create your views here.
 
@@ -81,6 +86,7 @@ class StudentView(generics.ListAPIView):
     pagination_class = CustomPageNumberPagination
     filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
     ordering_fields = ['person__last_name', 'person__first_name', ]
+    filter_fields = ('classroom_id', 'course_id', 'school_year', 'semester')
 
     def get_queryset(self):
         user = self.request.user
@@ -145,6 +151,15 @@ class StudentGradeView(generics.ListAPIView):
 
         raise serializers.ValidationError('course_id, school_year and semester need to be provide')
 
+
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Grade id')],
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties=GRADE_CHANGE_PROP
+        ),
+
+    )
     def put(self, request, class_id):
         user = request.user
         try:
@@ -154,7 +169,7 @@ class StudentGradeView(generics.ListAPIView):
         if 'start_update' in request.data.keys():
                 return Response('You have no right to update start_update field', status=status.HTTP_400_BAD_REQUEST)
 
-        grade_id = request.query_params.get('grade_id')
+        grade_id = request.query_params.get('id')
         if grade_id:
             grade = get_grade(grade_id)
             start_update = grade.start_update
@@ -171,7 +186,7 @@ class StudentGradeView(generics.ListAPIView):
             except serializers.ValidationError:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response('grade_id query param need to be provided', status=status.HTTP_400_BAD_REQUEST)
+            return Response('id query param need to be provided', status=status.HTTP_400_BAD_REQUEST)
 
 
 # Show list classrecord
@@ -198,23 +213,13 @@ class ClassRecordView(generics.ListAPIView):
 
         return classrecord
 
-
-    def post(self, request, class_id):
-        user = self.request.user
-        try:
-            teacher = Teacher.objects.get(account=user)
-        except Exception:
-            raise serializers.ValidationError('Your account is don\'t have permissions to acess this information')
-
-        request.data.update({'classroom_id': class_id, 'teacher_id': teacher.id})
-        serializer = RecordSerializer(data=request.data)
-        try:
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        except serializers.ValidationError as error:
-            return Response(error.detail, status=status.HTTP_400_BAD_REQUEST)
-
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Record id')],
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties=CLASSRECORD_CHANGE_PROP
+        ),
+    )
     def put(self, request, class_id):
         user = self.request.user
         try:
@@ -225,6 +230,7 @@ class ClassRecordView(generics.ListAPIView):
         id = request.query_params.get('id')
         if id:
             record = get_record(id)
+            request.data.update({'teacher': teacher})
             serializer = RecordSerializer(record, data=request.data, partial=True)
             try:
                 serializer.is_valid(raise_exception=True)
@@ -234,7 +240,7 @@ class ClassRecordView(generics.ListAPIView):
             except serializers.ValidationError as error:
                 return Response(error.detail, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response({'record_id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class StudyDocumentView(generics.ListAPIView):
@@ -258,6 +264,9 @@ class StudyDocumentView(generics.ListAPIView):
         except Teacher.DoesNotExist:
             return exceptions.NotFound('Teacher does not exist')
 
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='File id')],
+    )
     def delete(self, request):
         id = request.query_params.get('id')
         if id:
@@ -271,6 +280,13 @@ class UploadStudyDocumentView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (JSONParser, MultiPartParser, FileUploadParser)
 
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties=TEACHER_STUDY_DOC_PROP,
+            required=TEACHER_STUDY_DOC_REQUIRED
+        ),
+    )
     def post(self, request, *args, **kwargs):
         user = request.user
         try:
@@ -361,24 +377,31 @@ class StudentConductView(APIView):
         serializer = ConductSerializer(conducts, many=True)
         return Response(serializer.data)
 
-    def post(self, request):
-        user = request.user
-        try:
-            teacher = Teacher.objects.get(account=user)
-        except Exception:
-            raise serializers.ValidationError('Your account is don\'t have permissions to acess this information')
+    # def post(self, request):
+    #     user = request.user
+    #     try:
+    #         teacher = Teacher.objects.get(account=user)
+    #     except Exception:
+    #         raise serializers.ValidationError('Your account is don\'t have permissions to acess this information')
 
-        if not teacher.home_class.exists():
-            raise serializers.ValidationError('You don\'t have any homeclass')
+    #     if not teacher.home_class.exists():
+    #         raise serializers.ValidationError('You don\'t have any homeclass')
 
-        serializer = ConductSerializer(data=request.data)
-        try:
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        except serializers.ValidationError:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    #     serializer = ConductSerializer(data=request.data)
+    #     try:
+    #         serializer.is_valid(raise_exception=True)
+    #         serializer.save()
+    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #     except serializers.ValidationError:
+    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Conduct id')],
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties=CONDUCT_CHANGE_PROP
+        ),
+    )
     def put(self, request):
         user = request.user
         try:
@@ -448,6 +471,14 @@ class DeviceManageView(APIView, PaginationHandlerMixin):
         serializer = DeviceManageSerializer(device_manages, many=True)
         return Response(serializer.data)
 
+
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties=TEACHER_DEVICE_MANAGE_PROP,
+            required=TEACHER_DEVICE_MANAGE_REQUIRED
+        ),
+    )
     def post(self, request):
         user = request.user
         try:
@@ -463,3 +494,47 @@ class DeviceManageView(APIView, PaginationHandlerMixin):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except serializers.ValidationError as error:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Device manage id')],
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties=TEACHER_DEVICE_MANAGE_PROP)
+    )
+    def put(self, request):
+        user = request.user
+        try:
+            teacher = Teacher.objects.get(account=user)
+        except Exception:
+            raise serializers.ValidationError('Your account is don\'t have permissions to acess this information')
+
+        device_manage_id = request.query_params.get('id')
+        if device_manage_id:
+            device_manage = get_device_manage(device_manage_id)
+            serializer = DeviceManageSerializer(device_manage, data=request.data, partial=True)
+            try:
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return Response(serializer.data)
+            except serializers.ValidationError as error:
+                return Response(error.detail, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Device manage id')],
+    )
+    def delete(self, request):
+        user = request.user
+        try:
+            teacher = Teacher.objects.get(account=user)
+        except Exception:
+            raise serializers.ValidationError('Your account is don\'t have permissions to acess this information')
+
+        device_manage_id = request.query_params.get('id')
+        if device_manage_id:
+            delete_device_manage(device_manage_id)
+            return Response({'Delete successful'})
+        else:
+            return Response({'device_manage_id query param need to be provided'}, status=status.HTTP_400_BAD_REQUEST)

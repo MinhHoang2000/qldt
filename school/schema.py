@@ -47,7 +47,6 @@ CLASSRECORD_REQUIRED = ['classroom_id', 'teacher_id', 'course_id', 'day_of_week'
 
 
 CLASSRECORD_CHANGE_PROP = {
-    'teacher_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Teacher id'),
     'course_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Course id'),
     'attendant': openapi.Schema(type=openapi.TYPE_INTEGER, description='Attendant'),
     'note': openapi.Schema(type=openapi.TYPE_STRING, description='Note'),
@@ -73,7 +72,15 @@ DEVICE_MANAGE_PROP = {
     'teacher_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Teacher id'),
 }
 
+TEACHER_DEVICE_MANAGE_PROP = {
+    'device_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Device id'),
+    'day_of_week': openapi.Schema(type=openapi.TYPE_INTEGER, description='Mon, Tue, Wed,.., Sun'),
+    'shifts': openapi.Schema(type=openapi.TYPE_INTEGER, description='Shifts'),
+    'week': openapi.Schema(type=openapi.TYPE_INTEGER, description='Week of study'),
+}
+
 DEVICE_MANAGE_REQUIRED = ['device_id', 'day_of_week', 'shifts', 'week', 'teacher_id']
+TEACHER_DEVICE_MANAGE_REQUIRED = ['device_id', 'day_of_week', 'shifts', 'week']
 
 STUDY_DOC_PROP = {
     'name': openapi.Schema(type=openapi.TYPE_STRING, description='Title for the file'),
@@ -84,4 +91,13 @@ STUDY_DOC_PROP = {
     'file': openapi.Parameter('file', openapi.IN_BODY, type=openapi.TYPE_FILE, description='File upload'),
 }
 
+TEACHER_STUDY_DOC_PROP = {
+    'name': openapi.Schema(type=openapi.TYPE_STRING, description='Title for the file'),
+    'study_week': openapi.Schema(type=openapi.TYPE_INTEGER, description='Week of study'),
+    'course_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Course id'),
+    'classroom_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Classroom id'),
+    'file': openapi.Parameter('file', openapi.IN_BODY, type=openapi.TYPE_FILE, description='File upload'),
+}
+
 STUDY_DOC_REQUIRED = ['name', 'study_week', 'teacher_id', 'course_id', 'classroom_id', 'file']
+TEACHER_STUDY_DOC_REQUIRED = ['name', 'study_week', 'course_id', 'classroom_id', 'file']

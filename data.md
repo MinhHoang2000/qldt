@@ -1,3 +1,101 @@
+# Account
+## Teacher
+``` json
+    {
+      "person": {
+        "first_name": "Nhu",
+        "last_name": "Nguyen Thi",
+        "gender": "F",
+        "date_of_birth": "1995-04-03",
+        "address": "178 Tran Hung Dao, Ha Noi",
+        "ethnicity": "Kinh",
+        "religion" : "None",
+        "phone_number": "09224214570"
+      },
+      "account": {
+        "username": "nhunt84",
+        "password": "nhu12345678",
+        "email": "nhunt@gmail.com"
+      }
+    }
+
+    {
+      "person": {
+        "first_name": "Nga",
+        "last_name": "Nguyen Thi",
+        "gender": "F",
+        "date_of_birth": "1993-01-31",
+        "address": "19 Nam Dong, Ha Noi",
+        "ethnicity": "Kinh",
+        "religion" : "None",
+        "phone_number": "09904990781"
+      },
+      "account": {
+        "username": "ngant84",
+        "password": "nga12345678",
+        "email": "ngant@gmail.com"
+      }
+    }
+
+    {
+      "person": {
+        "first_name": "Tram",
+        "last_name": "Phi Thi",
+        "gender": "F",
+        "date_of_birth": "1992-09-27",
+        "address": "981 Cat Linh, Ha Noi",
+        "ethnicity": "Kinh",
+        "religion" : "None",
+        "phone_number": "09056028783"
+      },
+      "account": {
+        "username": "trampt84",
+        "password": "tram12345678",
+        "email": "trampt@gmail.com"
+      }
+    }
+
+```
+
+```sql
+-- Teacher
+insert into account(id, username, password, email, is_admin, is_active, join_at)
+values (1, "us1", "123456", "us1@gmail.com", false, true, "2021-01-01"),
+       (2, "us2", "123456", "us2@gmail.com", false, true, "2021-01-01"),
+       (3, "us3", "123456", "us3@gmail.com", false, true, "2021-01-01"),
+       (4, "us4", "123456", "us4@gmail.com", false, true, "2021-01-01"),
+       (5, "us5", "123456", "us5@gmail.com", false, true, "2021-01-01"),
+       (6, "us6", "123456", "us6@gmail.com", false, true, "2021-01-01"),
+       (7, "us7", "123456", "us7@gmail.com", false, true, "2021-01-01"),
+       (8, "us8", "123456", "us8@gmail.com", false, true, "2021-01-01"),
+       (9, "us9", "123456", "us9@gmail.com", false, true, "2021-01-01"),
+       (10, "us11", "123456", "us10@gmail.com", false, true, "2021-01-01"),
+       (11, "us10", "123456", "us11@gmail.com", false, true, "2021-01-01"),
+       (12, "us12", "123456", "us12@gmail.com", false, true, "2021-01-01"),
+       (13, "us13", "123456", "us13@gmail.com", false, true, "2021-01-01"),
+       (14, "us14", "123456", "us14@gmail.com", false, true, "2021-01-01"),
+       (15, "us15", "123456", "us15@gmail.com", false, true, "2021-01-01"),
+       (16, "us16", "123456", "us16@gmail.com", false, true, "2021-01-01"),
+       (17, "us17", "123456", "us17@gmail.com", false, true, "2021-01-01"),
+       (18, "us18", "123456", "us18@gmail.com", false, true, "2021-01-01"),
+       (19, "us19", "123456", "us19@gmail.com", false, true, "2021-01-01"),
+       (20, "us20", "123456", "us20@gmail.com", false, true, "2021-01-01"),
+       (21, "us21", "123456", "us21@gmail.com", false, true, "2021-01-01"),
+       (22, "us22", "123456", "us22@gmail.com", false, true, "2021-01-01"),
+       (23, "us23", "123456", "us23@gmail.com", false, true, "2021-01-01"),
+       (24, "us24", "123456", "us24@gmail.com", false, true, "2021-01-01"),
+       (25, "us25", "123456", "us25@gmail.com", false, true, "2021-01-01"),
+       (26, "us26", "123456", "us26@gmail.com", false, true, "2021-01-01"),
+       (27, "us27", "123456", "us27@gmail.com", false, true, "2021-01-01"),
+       (28, "us23", "123456", "us28@gmail.com", false, true, "2021-01-01"),
+       (29, "us24", "123456", "us29@gmail.com", false, true, "2021-01-01"),
+       (30, "us25", "123456", "us30@gmail.com", false, true, "2021-01-01"),
+       (31, "us26", "123456", "us31@gmail.com", false, true, "2021-01-01"),
+       (32, "us27", "123456", "us31@gmail.com", false, true, "2021-01-01")
+
+```
+
+
 # Person Info
 ```sql
 
@@ -26,7 +124,52 @@ values (1, 'Ngoc', 'Nguyen Thi', 'F', '1984-04-23', '10 Hai Ba Trung, Ha Noi', '
        (21, 'Thuy', 'Do Thi', 'F', '1958-03-23', '148 Van Noi, Ha Noi', 'Kinh', 'None', '09853010227'),
        (22, 'Thu', 'Nguyen Thi', 'F', '1998-04-30', '17 Vong La, Ha Noi', 'Kinh', 'None', '09678883267'),
        (23, 'Vy', 'Nguyen Thi', 'F', '1989-04-28', '167 Thuong Cat, Ha Noi', 'Kinh', 'None', '09483703004'),
-       (24, 'Hue', 'Phi Thi', 'F', '1948-04-29', '481 Duong Lieu, Ha Noi', 'Kinh', 'None', '09850731524')
+       (24, 'Hue', 'Phi Thi', 'F', '1948-04-29', '481 Duong Lieu, Ha Noi', 'Kinh', 'None', '09850731524'),
+       (25, 'Hong', 'Tran Thi', 'F', '1986-01-10', '16 Tho Xuan, Ha Noi', 'Kinh', 'None', '09678960885'),
+       (26, 'Hien', 'Le Thi', 'F', '1979-03-12', '72 Dan Phuong, Ha Noi', 'Kinh', 'None', '09305856601'),
+       (27, 'THao', 'Pham Thi', 'F', '1978-07-24', '124 Hiep Thuan, Ha Noi', 'Kinh', 'None', '09345941674'),
+       (28, 'An', 'Phan Thi', 'F', '1974-12-25', '358 Canh Nau, Ha Noi', 'Kinh', 'None', '09712687303'),
+       (29, 'Lan', 'Dang Thi', 'F', '1990-10-17', '123 Huong Ngai, Ha Noi', 'Kinh', 'None', '09744831734'),
+       (30, 'Thanh', 'Hoang Viet', 'F', '1990-10-14', '14 Sai Son, Ha Noi', 'Kinh', 'None', '09336397388'),
+       (31, 'My', 'Ngo Thi', 'F', '1979-06-15', '148 Van Phuc, Ha Noi', 'Kinh', 'None', '09922951999'),
+       (32, 'Nhi', 'Do Thi', 'F', '1986-03-08', '184 Phu Luong, Ha Noi', 'Kinh', 'None', '09947467251')
+
+```
+
+# Teacher
+```sql
+  insert into teacher(account_id, person_id)
+  values (1, 1),
+         (2, 2),
+         (3, 3),
+         (4, 4),
+         (5, 5),
+         (6, 6),
+         (7, 7),
+         (8, 8),
+         (9, 9),
+         (10, 10),
+         (12, 12),
+         (13, 13),
+         (14, 14),
+         (15, 15),
+         (16, 16),
+         (17, 17),
+         (18, 18),
+         (19, 19),
+         (20, 20),
+         (21, 21),
+         (22, 22),
+         (23, 23),
+         (24, 24),
+         (25, 25),
+         (26, 26),
+         (27, 27),
+         (28, 28),
+         (29, 29),
+         (30, 30),
+         (31, 31),
+         (32, 32),
 
 ```
 
@@ -56,14 +199,14 @@ values ('10A', 'B102', 1),
        ('12E', 'B306', 21),
        ('12H', 'B307', 22),
        ('12G', 'B308', 23),
-       ('12H', 'B309', 24)
+       ('12H', 'B309', 24);
 ```
 
 # Course
 ```sql
 insert into course(course_name, group_course)
 values ('Toan', 'Sc'),
-       ('Ngu Van', 'So'),
+       ('Ngu van', 'So'),
        ('Ngoai ngu', 'So'),
        ('Giao duc con dan', 'So'),
        ('Dia ly', 'Sc'),
@@ -73,6 +216,32 @@ values ('Toan', 'Sc'),
        ('Cong nghe', 'Sc'),
        ('Tin hoc', 'Sc'),
        ('Giao duc the chat', 'Ph'),
-       ('Giao duc quoc phong', 'Ph'),
+       ('Giao duc quoc phong', 'Ph');
 ```
 
+# Achievement
+```sql
+insert into achievement(achievement_name)
+values ('Hoc sinh gioi 2021'),
+       ('Hoc sinh tien tien 2021'),
+       ('Hoc sinh gioi Toan thanh pho 2021'),
+       ('Hoc sinh gioi Ngu van thanh pho 2021'),
+       ('Hoc sinh gioi Vat ly thanh pho 2021'),
+       ('Hoc sinh gioi Hoa hoc thanh pho 2021'),
+       ('Hoc sinh gioi Ngoai ngu thanh pho 2021'),
+       ('Giao vien xuat sac 2021'),
+       ('Giao vien gioi thanh pho 2021'),
+       ('Lop xuat sac 2021')
+
+```
+
+# Device
+```sql
+insert into device(device_name, status, amount, price)
+values ('Dai cat set', 'O', 10, 200000),
+       ('Dai Casio', 'N', 20, 500000),
+       ('Dieu hoa Tosiba', 'N', 30, 5000000),
+       ('May chieu', 'N', 30, 10000000),
+       ('Loa', 'N', 10, 300000),
+       ('Mic', 'N', 24, 200000)
+```

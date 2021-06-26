@@ -5,6 +5,7 @@ from teachers.models import Teacher
 
 from teachers.serializers import TeacherSerializer
 
+
 from .validations import validate_classroom_timetable, validate_teacher_timetable, validate_classroom_record, validate_classroom_attendant, validate_device_manage
 import logging
 logger = logging.getLogger(__name__)
@@ -27,13 +28,13 @@ class CourseSerializer(serializers.ModelSerializer):
 
 
 class TimetableSerializer(serializers.ModelSerializer):
-    classroom_id = serializers.IntegerField(write_only=True)
-    teacher_id = serializers.IntegerField()
-    course_id = serializers.IntegerField()
+    classroom = ClassroomSerializer()
+    teacher = TeacherSerializer()
+    course = CourseSerializer()
 
     class Meta:
         model = Timetable
-        fields = ['id', 'classroom_id', 'teacher_id', 'course_id', 'day_of_week', 'shifts', 'semester', 'school_year']
+        fields = ['id', 'day_of_week', 'shifts', 'semester', 'school_year', 'course', 'teacher', 'classroom']
 
     def create(self, validated_data):
         classroom_id = validated_data.get('classroom_id')
@@ -62,9 +63,9 @@ class TimetableSerializer(serializers.ModelSerializer):
 
 
 class RecordSerializer(serializers.ModelSerializer):
-    classroom_id = serializers.IntegerField(write_only=True)
-    teacher_id = serializers.IntegerField()
-    course_id = serializers.IntegerField()
+    classroom = ClassroomSerializer()
+    teacher = TeacherSerializer()
+    course = CourseSerializer()
     total_student = serializers.SerializerMethodField()
 
     class Meta:

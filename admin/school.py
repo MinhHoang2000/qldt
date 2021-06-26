@@ -160,7 +160,14 @@ class DeviceManageView(APIView, PaginationHandlerMixin):
 
     @swagger_auto_schema(
         manual_parameters=[
-        openapi.Parameter('device_id', openapi.IN_QUERY, description="Device id", type=openapi.TYPE_INTEGER)],
+            openapi.Parameter('device_id', openapi.IN_QUERY, description="Device id", type=openapi.TYPE_INTEGER),
+            openapi.Parameter('teacher_id', openapi.IN_QUERY, description="Teacher id", type=openapi.TYPE_INTEGER),
+            openapi.Parameter('sort', openapi.IN_QUERY, type=openapi.TYPE_STRING, description='day_of_week, shifts, week'),
+            openapi.Parameter('week', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Week'),
+            openapi.Parameter('shifts', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Shifts'),
+            openapi.Parameter('day_of_week', openapi.IN_QUERY, type=openapi.TYPE_STRING, description='Day of week'),
+        ],
+
     )
     def get(self, request):
         device_id = request.query_params.get('device_id')

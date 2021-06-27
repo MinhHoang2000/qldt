@@ -58,16 +58,57 @@ class ConductSerializer(serializers.ModelSerializer):
         model = Conduct
         fields = ['id', 'score', 'semester', 'school_year', 'student_id']
 
+
+class StudentParentSerializer(serializers.ModelSerializer):
+    person = PersonSerializer()
+    classroom = ClassroomSerializer()
+    class Meta:
+        model = Student
+        fields = '__all__'
+
+class ParentSerializer(serializers.ModelSerializer):
+    person = PersonSerializer()
+    student_id = serializers.PrimaryKeyRelatedField(source='students', many=True, queryset=Student.objects.all(), write_only=True)
+    students = StudentParentSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = Parent
+        fields = ['id', 'person', 'student_id', 'avacation', 'students']
+
+    def create(self, validated_data):
+        logger.error(validated_data)
+        person = create_person(validated_data.pop('person'))
+        parent = Parent.objects.create(person=person, avacation=validated_data.pop('avacation'))
+        for student in validated_data.pop('students'):
+            parent.students.add(student)
+
+        parent.save()
+        return parent
+
+    def update(self, instance, validated_data):
+        try:
+            update_person(instance.person, validated_data.pop('person'))
+        except KeyError:
+            pass
+
+        instance.students.clear()
+        for student in validated_data.pop('students'):
+            instance.students.add(student)
+
+        instance.save()
+        return instance
+
+
 class StudentSerializer(serializers.ModelSerializer):
     account = AccountSerializer()
     person = PersonSerializer()
     health = HealthSerializer(required=False, allow_null=True)
     classroom_id = serializers.IntegerField()
-    parent_id = serializers.PrimaryKeyRelatedField(source='parents', read_only=True, many=True)
+    parents = ParentSerializer(many=True, read_only=True)
 
     class Meta:
         model = Student
-        fields = ['id', 'account', 'person', 'classroom_id', 'admission_year', 'health', 'status', 'parent_id']
+        fields = ['id', 'account', 'person', 'classroom_id', 'admission_year', 'health', 'status', 'parents']
 
     def create(self, validated_data):
         person_model = create_person(validated_data.pop('person'))
@@ -113,34 +154,3 @@ class StudentSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-
-class ParentSerializer(serializers.ModelSerializer):
-    person = PersonSerializer()
-    student_id = serializers.PrimaryKeyRelatedField(source='students', many=True, queryset=Student.objects.all())
-
-    class Meta:
-        model = Parent
-        fields = ['id', 'person', 'student_id', 'avacation']
-
-    def create(self, validated_data):
-        logger.error(validated_data)
-        person = create_person(validated_data.pop('person'))
-        parent = Parent.objects.create(person=person, avacation=validated_data.pop('avacation'))
-        for student in validated_data.pop('students'):
-            parent.students.add(student)
-
-        parent.save()
-        return parent
-
-    def update(self, instance, validated_data):
-        try:
-            update_person(instance.person, validated_data.pop('person'))
-        except KeyError:
-            pass
-
-        instance.students.clear()
-        for student in validated_data.pop('students'):
-            instance.students.add(student)
-
-        instance.save()
-        return instance

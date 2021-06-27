@@ -5,7 +5,6 @@ urlpatterns = [
     #account
     path('info', StudentInfoView.as_view()),
     path('class', ClassroomInfoView.as_view()),
-    path('parents', ParentListView.as_view()),
     path('achievements', AchievementListView.as_view()),
 
     #timetable1

@@ -11,12 +11,13 @@ from .validations import validate_classroom_timetable, validate_teacher_timetabl
 import logging
 logger = logging.getLogger(__name__)
 
+
+
 class StudentClassSerializer(serializers.ModelSerializer):
     person = PersonSerializer()
     class Meta:
         model = Student
         fields = '__all__'
-
 
 class ClassroomSerializer(serializers.ModelSerializer):
     homeroom_teacher_id = serializers.IntegerField(write_only=True)

@@ -56,14 +56,16 @@ INSTALLED_APPS = [
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
     'ACCESS_TOKEN_LIFETIME': timedelta(days=7),
-    'AUTH_HEADER_TYPES': ('Bearer', 'Token'),
+    'AUTH_HEADER_TYPES': ('Bearer', 'Token', ''),
     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=30),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=7),
 }
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+
     ],
 
     'DEFAULT_PERMISSION_CLASSES': [
@@ -76,6 +78,19 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 20,
     'ORDERING_PARAM': 'sort',
 
+}
+
+SWAGGER_SETTINGS = {
+   'SECURITY_DEFINITIONS': {
+        'Basic': {
+            'type': 'basic'
+        },
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+        }
+   }
 }
 
 MIDDLEWARE = [

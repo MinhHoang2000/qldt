@@ -29,8 +29,12 @@ import os
 from config import settings
 import mimetypes
 from django.http import HttpResponse
-from config.settings import REST_FRAMEWORK
 
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
+
+from config.settings import REST_FRAMEWORK
 ORDERING_PARAM = REST_FRAMEWORK['ORDERING_PARAM']
 
 #Account
@@ -75,6 +79,10 @@ class ParentListView(APIView):
 
 class AchievementListView(APIView):
     permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter('sort', openapi.IN_QUERY, type=openapi.TYPE_STRING, description='achievement_name')]
+    )
     def get(self, request):
         user = request.user
         try:
@@ -82,14 +90,28 @@ class AchievementListView(APIView):
         except Exception:
             raise serializers.ValidationError('Your account is don\'t have permissions to acess this information')
 
-        achivement = student.achievements.all()
-        serializer = AchievementSerializer(achivement, many=True)
+        achievement = student.achievements.all()
+        sort = request.query_params.get('sort')
+        if sort:
+            achievement = achievement.order_by(f'{sort}')
+
+        serializer = AchievementSerializer(achievement, many=True)
         return Response(serializer.data)
 
 
 #TimeTable
 class TimeTableView(APIView):
     permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        manual_parameters=[
+        openapi.Parameter('sort', openapi.IN_QUERY, type=openapi.TYPE_STRING, description='day_of_week, shifts'),
+        openapi.Parameter('school_year', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='School year'),
+        openapi.Parameter('semester', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Semester'),
+        openapi.Parameter('course_id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Course id'),
+        openapi.Parameter('teacher_id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Teacher id'),
+        ],
+    )
     def get(self, request):
         user = request.user
         try:
@@ -97,15 +119,25 @@ class TimeTableView(APIView):
         except Exception:
             raise serializers.ValidationError('Your account is don\'t have permissions to acess this information')
         timetables = Timetable.objects.filter(classroom=student.classroom)
+
         school_year = request.query_params.get('school_year')
         semester = request.query_params.get('semester')
+        teacher_id = request.query_params.get('teacher_id')
+        course_id = request.query_params.get('course_id')
+        sort = request.query_params.get('sort')
         if school_year:
             timetables = timetables.filter(school_year=school_year)
-
         if semester:
             timetables = timetables.filter(semester=semester)
+        if teacher_id:
+            timetables = timetables.filter(teacher_id=teacher_id)
+        if course_id:
+            timetables = timetables.filter(course_id=course_id)
 
-        serializer = TimetableSerializer(timetable, many=True)
+        if sort:
+            timetables = timetables.order_by(f'{sort}')
+
+        serializer = TimetableSerializer(timetables, many=True)
         return Response(serializer.data)
 
 
@@ -113,6 +145,14 @@ class TimeTableView(APIView):
 class GradeListView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        manual_parameters=[
+        openapi.Parameter('sort', openapi.IN_QUERY, type=openapi.TYPE_STRING, description='final_test, mid_term_test'),
+        openapi.Parameter('school_year', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='School year'),
+        openapi.Parameter('semester', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Semester'),
+        openapi.Parameter('course_id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Course id'),
+        ],
+    )
     def get(self, request):
         user = request.user
         try:
@@ -121,14 +161,19 @@ class GradeListView(APIView):
             raise serializers.ValidationError('Your account is don\'t have permissions to acess this information')
         grades = student.grades.all()
 
+        sort = request.query_params.get('sort')
         school_year = request.query_params.get('school_year')
         semester = request.query_params.get('semester')
+        course_id = request.query_params.get('course_id')
 
         if school_year:
             grades = grades.filter(school_year=school_year)
-
         if semester:
             grades = grades.filter(semester=semester)
+        if course_id:
+            grades = grades.filter(course_id=course_id)
+        if sort:
+            grades = grades.order_by(f'{sort}')
 
 
         serializer = GradeSerializer(grades, many=True)
@@ -137,6 +182,13 @@ class GradeListView(APIView):
 #Conduct
 class ConductListView(APIView):
     permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        manual_parameters=[
+        openapi.Parameter('school_year', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='School year'),
+        openapi.Parameter('semester', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Semester'),
+        ]
+    )
     def get(self, request):
         user = request.user
         try:
@@ -150,7 +202,6 @@ class ConductListView(APIView):
 
         if school_year:
             conducts = conducts.filter(school_year=school_year)
-
         if semester:
             conducts = conducts.filter(semester=semester)
 
@@ -162,6 +213,13 @@ class StudyDocumentView(APIView, PaginationHandlerMixin):
     pagination_class = Pagination
     parser_classes = (JSONParser, MultiPartParser, FileUploadParser)
 
+    @swagger_auto_schema(
+        manual_parameters=[
+        openapi.Parameter('sort', openapi.IN_QUERY, type=openapi.TYPE_STRING, description='name'),
+        openapi.Parameter('teacher_id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Teacher id'),
+        openapi.Parameter('course_id', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Course id'),
+        ]
+    )
     def get(self, request):
         user = request.user
         try:
@@ -172,13 +230,10 @@ class StudyDocumentView(APIView, PaginationHandlerMixin):
         files = StudyDocument.objects.filter(classroom=student.classroom)
 
         # Get query param for id or sort
-        id = request.query_params.get('id')
         sort = request.query_params.get(ORDERING_PARAM)
         course_id = request.query_params.get('course_id')
         teacher_id = request.query_params.get('teacher_id')
 
-        if id:
-            files = files.filter(id=id)
         if course_id:
             files = files.filter(course_id=course_id)
         if teacher_id:

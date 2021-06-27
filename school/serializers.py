@@ -122,11 +122,13 @@ class RecordSerializer(serializers.ModelSerializer):
 
 class DeviceManageSerializer(serializers.ModelSerializer):
     device_id = serializers.IntegerField(write_only=True)
-    teacher_id = serializers.IntegerField()
+    teacher_id = serializers.IntegerField(write_only=True)
+    teacher = TeacherSerializer(read_only=True)
+
 
     class Meta:
         model = DeviceManage
-        fields = ['id', 'day_of_week', 'week', 'shifts', 'teacher_id', 'device_id']
+        fields = ['id', 'day_of_week', 'week', 'shifts', 'teacher_id', 'device_id', 'teacher']
 
     def create(self, validated_data):
         device_id = validated_data.get('device_id')

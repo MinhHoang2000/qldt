@@ -152,7 +152,7 @@ class TimetableChangeView(APIView):
 class TimetableDeleteView(APIView):
     # permission_classes = (IsAdminUser, IsAuthenticated)
     def delete(self, request, pk):
-        delete_timetable(time_id)
+        delete_timetable(pk)
         return Response({'Delete successful'})
 
 class TimetableStudentView(APIView, PaginationHandlerMixin):

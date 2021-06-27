@@ -29,6 +29,8 @@ TIMETABLE_REQURIED = ['classroom_id', 'teacher_id', 'course_id', 'day_of_week', 
 TIMETABLE_CHANGE_PROP = {
     'teacher_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Teacher id'),
     'course_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Course id'),
+    'shifts': openapi.Schema(type=openapi.TYPE_INTEGER, description='Shifts'),
+    'day_of_week': openapi.Schema(type=openapi.TYPE_STRING, description='Mon, Tue, Wed,..., Sun'),
 }
 
 CLASSRECORD_PROP = {

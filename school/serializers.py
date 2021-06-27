@@ -53,13 +53,19 @@ class TimetableSerializer(serializers.ModelSerializer):
         return Timetable.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
-        try:
-            teacher_id = validated_data.pop('teacher_id')
-            validate_teacher_timetable(teacher_id, instance.day_of_week, instance.shifts)
+        semester = validated_data.get('semester', instance.semester)
+        school_year = validated_data.get('school_year', instance.school_year)
+        day_of_week = validated_data.get('day_of_week', instance.day_of_week)
+        shifts = validated_data.get('shifts', instance.shifts)
+        teacher_id = validated_data.get('teacher_id', instance.teacher_id)
+        if teacher_id:
+            validate_teacher_timetable(teacher_id, day_of_week, shifts, semester, school_year)
             instance.teacher_id = teacher_id
-        except KeyError:
-            pass
 
+        instance.semester = semester
+        instance.school_year = school_year
+        instance.day_of_week = day_of_week
+        instance.shifts = shifts
         instance.course_id = validated_data.get('course_id', instance.course_id)
         instance.save()
         return instance

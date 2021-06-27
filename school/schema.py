@@ -31,6 +31,8 @@ TIMETABLE_CHANGE_PROP = {
     'course_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Course id'),
     'shifts': openapi.Schema(type=openapi.TYPE_INTEGER, description='Shifts'),
     'day_of_week': openapi.Schema(type=openapi.TYPE_STRING, description='Mon, Tue, Wed,..., Sun'),
+    'semester': openapi.Schema(type=openapi.TYPE_INTEGER, description='Semester'),
+    'school_year' : openapi.Schema(type=openapi.TYPE_INTEGER, description='Shool year'),
 }
 
 CLASSRECORD_PROP = {
